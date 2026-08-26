@@ -5,10 +5,10 @@ import { esRutaProtegida } from "@/lib/auth/roles"
 
 /**
  * Solo hace el redirect rapido cuando NO hay cookie de sesion: no consulta la
- * base ni valida el rol (el middleware corre en el edge). El permiso de verdad
+ * base ni valida el rol (el proxy corre en el edge). El permiso de verdad
  * se verifica en los layouts con exigirSesion().
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const cookieSesion = getSessionCookie(request)
 
@@ -28,6 +28,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Todo menos assets estaticos y las rutas de Better Auth.
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|.*\.svg|.*\.png).*)"],
+  matcher: [
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.svg|.*\\.png).*)",
+  ],
 }
