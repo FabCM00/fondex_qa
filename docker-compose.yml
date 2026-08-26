@@ -1,0 +1,24 @@
+# Base de datos local para desarrollo y pruebas.
+#   docker compose up -d      levanta
+#   docker compose down -v    borra (incluye datos)
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: motores-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: motores
+      POSTGRES_PASSWORD: motores
+      POSTGRES_DB: coopvalili_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - motores-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U motores -d coopvalili_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  motores-db-data:

@@ -49,12 +49,12 @@
 
 :root {
     --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --foreground: oklch(33.984% 0.00419 16.857);
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(33.289% 0.00004 271.152);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.553 0.195 38.402);
+    --primary: #fe9a00;
     --primary-foreground: oklch(0.98 0.016 73.684);
     --secondary: oklch(0.967 0.001 286.375);
     --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -74,8 +74,8 @@
     --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.646 0.222 41.116);
-    --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
+    --sidebar-primary: #ffbf53;
+    --sidebar-primary-foreground: oklch(0.28 0.035 65);
     --sidebar-accent: oklch(0.97 0 0);
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
@@ -83,13 +83,13 @@
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
+    --background: oklch(24.884% 0.0015 16.221);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.47 0.157 37.304);
+    --primary: #fe9a00;
     --primary-foreground: oklch(0.98 0.016 73.684);
     --secondary: oklch(0.274 0.006 286.033);
     --secondary-foreground: oklch(0.985 0 0);
@@ -108,12 +108,31 @@
     --chart-5: oklch(0.269 0 0);
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.705 0.213 47.604);
-    --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
+    --sidebar-primary: #ffbf53;
+    --sidebar-primary-foreground: oklch(0.28 0.035 65);
     --sidebar-accent: oklch(0.269 0 0);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* El buscador de Monaco aparece pegado al borde superior; lo bajamos solo
+   cuando esta abierto (cerrado vive fuera de vista y no debe reposicionarse). */
+.monaco-editor .find-widget.visible {
+  top: 14px !important;
+}
+
+.monaco-editor .find-widget:not(.visible) {
+  visibility: hidden;
+}
+
+/* Scroll sin barra visible (el contenido sigue siendo desplazable). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer base {
