@@ -1,11 +1,33 @@
 "use client"
 
+import * as React from "react"
+
 import { useDashboard } from "@/components/dashboard-context"
 import { Titulo } from "@/components/solicitud/etiqueta"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  cargarMetodosAcceso,
+  type MetodoAcceso,
+} from "@/lib/auth/metodos"
+import { KeyRoundIcon } from "lucide-react"
 
 export function VistaMiPerfil() {
   const { usuario } = useDashboard()
+
+  const [metodos, setMetodos] = React.useState<MetodoAcceso[] | null>(null)
+
+  React.useEffect(() => {
+    let vigente = true
+
+    cargarMetodosAcceso().then((filas) => {
+      if (vigente) setMetodos(filas)
+    })
+
+    return () => {
+      vigente = false
+    }
+  }, [])
 
   const campos = [
     { label: "Nombre completo", value: usuario.nombre },
@@ -52,6 +74,53 @@ export function VistaMiPerfil() {
               </div>
             ))}
           </dl>
+        </section>
+
+        {/* Con que puede entrar esta cuenta. Cada fila es un metodo vinculado. */}
+        <section>
+          <Titulo>Formas de iniciar sesión</Titulo>
+
+          {metodos === null ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : (
+            <ul className="border-t">
+              {metodos.map((metodo) => (
+                <li
+                  key={metodo.id}
+                  className="flex items-center gap-3 border-b px-4 py-3"
+                >
+                  {metodo.nombre.startsWith("Microsoft") ? (
+                    <svg
+                      viewBox="0 0 21 21"
+                      className="size-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                      <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                      <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                      <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                    </svg>
+                  ) : (
+                    <KeyRoundIcon className="size-4 shrink-0 text-muted-foreground" />
+                  )}
+
+                  <span className="text-sm font-medium">{metodo.nombre}</span>
+
+                  <span className="ms-auto shrink-0 text-xs text-muted-foreground">
+                    Desde {metodo.desde}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            Puedes entrar con cualquiera de estas. Para vincular tu cuenta de
+            Microsoft, inicia sesión con ella una vez.
+          </p>
         </section>
       </div>
     </div>

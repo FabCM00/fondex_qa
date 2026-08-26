@@ -38,11 +38,15 @@ model User {
   image String?
   role Role @default(COLABORADOR)
   active Boolean @default(false)
+  /// Segundo factor activo. Solo aplica al login con contrasena: quien entra
+  /// por Microsoft ya paso el MFA de Entra ID.
+  twoFactorEnabled Boolean @default(false)
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   sessions Session[]
   accounts Account[]
+  twoFactors TwoFactor[]
 
   @@index([email], map: "idx_user_email")
   @@index([role], map: "idx_user_role")
@@ -101,6 +105,42 @@ model Verification {
 
   @@index([identifier], map: "idx_verification_identifier")
   @@map("verification")
+}
+
+/// El segundo factor de un usuario: el secreto TOTP que comparte con su app de
+/// autenticacion y los codigos de respaldo para cuando pierde el telefono.
+///
+/// `failedVerificationCount` y `lockedUntil` frenan la fuerza bruta contra el
+/// codigo: seis digitos se adivinan rapido si se puede intentar sin limite.
+model TwoFactor {
+  id String @id @default(cuid())
+  userId String
+  secret String
+  backupCodes String
+  verified Boolean @default(false)
+  failedVerificationCount Int @default(0)
+  lockedUntil DateTime? @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_two_factor_userid")
+  @@map("twoFactor")
+}
+
+/// Contador de peticiones por clave (IP + ruta). Better Auth lo usa para frenar
+/// la fuerza bruta contra el login.
+///
+/// Vive en la base y no en memoria porque con varias instancias cada una
+/// tendria su propio contador, y bastaria repartir los intentos entre ellas
+/// para saltarse el limite.
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  /// Epoch en milisegundos, no DateTime: asi lo escribe Better Auth.
+  lastRequest BigInt
+
+  @@map("rateLimit")
 }
 
 // ---------------------------------------------------------------------------

@@ -20,6 +20,8 @@ const REGLAS: { prefijo: string; roles: Rol[] }[] = [
 /** Rutas que no exigen sesion. */
 export const RUTAS_PUBLICAS = [
   "/login",
+  // El segundo factor: se llega con la contrasena ya validada pero sin sesion.
+  "/verificar",
   "/forgot-password",
   // Se llega desde el correo, sin sesion: el token del enlace es lo que
   // autoriza el cambio.

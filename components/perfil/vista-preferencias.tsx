@@ -19,9 +19,23 @@ import { Switch } from "@/components/ui/switch"
 import {
   CheckIcon,
   KeyRoundIcon,
+  LoaderCircleIcon,
   LogOutIcon,
   ShieldCheckIcon,
 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useNotificaciones } from "@/components/ui/notificaciones"
+import { DialogoDosPasos } from "@/components/perfil/dialogo-dos-pasos"
+import { twoFactor, useSession } from "@/lib/auth/cliente"
 
 const TEMAS = [
   {
@@ -65,9 +79,63 @@ function Fila({
 
 export function VistaPreferencias() {
   const { theme, setTheme } = useTheme()
-  const [dobleFactor, setDobleFactor] = React.useState(false)
   const { cerrarSesion, cerrando } = useCerrarSesion()
   const modoNavegacion = useModoNavegacion()
+  const { notificar } = useNotificaciones()
+  const { data: sesion } = useSession()
+
+  // El estado real vive en el servidor (User.twoFactorEnabled); la sesion lo
+  // trae, asi que no hace falta consultarlo aparte.
+  const activoEnServidor =
+    (sesion?.user as { twoFactorEnabled?: boolean } | undefined)
+      ?.twoFactorEnabled ?? false
+
+  const [dobleFactor, setDobleFactor] = React.useState(activoEnServidor)
+
+  // Al llegar la sesion se sincroniza el switch, sin pisar un cambio que el
+  // usuario acabe de hacer en esta pantalla.
+  const [previo, setPrevio] = React.useState(activoEnServidor)
+
+  if (activoEnServidor !== previo) {
+    setPrevio(activoEnServidor)
+    setDobleFactor(activoEnServidor)
+  }
+
+  const [activando, setActivando] = React.useState(false)
+  const [desactivando, setDesactivando] = React.useState(false)
+  const [cambiando2FA, setCambiando2FA] = React.useState(false)
+  const [passwordDesactivar, setPasswordDesactivar] = React.useState("")
+  const [errorDesactivar, setErrorDesactivar] = React.useState<string | null>(
+    null
+  )
+
+  /** El switch no cambia nada por si solo: abre el flujo correspondiente. */
+  const alternarDosPasos = (activar: boolean) => {
+    if (activar) setActivando(true)
+    else setDesactivando(true)
+  }
+
+  const desactivarDosPasos = async () => {
+    setErrorDesactivar(null)
+    setCambiando2FA(true)
+
+    const { error } = await twoFactor.disable({ password: passwordDesactivar })
+
+    setCambiando2FA(false)
+
+    if (error) {
+      return setErrorDesactivar(
+        error.code === "INVALID_PASSWORD"
+          ? "La contraseña no es correcta."
+          : (error.message ?? "No pudimos desactivar la verificación.")
+      )
+    }
+
+    setDobleFactor(false)
+    setDesactivando(false)
+    setPasswordDesactivar("")
+    notificar("Verificación en dos pasos desactivada.", "exito")
+  }
 
   // next-themes solo conoce el tema en el cliente: en el servidor devolvemos
   // false para que el marcado inicial coincida con la hidratacion.
@@ -201,23 +269,97 @@ export function VistaPreferencias() {
             <Fila
               icono={<ShieldCheckIcon className="size-4" />}
               titulo="Verificación en dos pasos (2FA)"
-              descripcion="Código OTP de un solo uso al iniciar sesión."
+              descripcion="Código de tu app de autenticación al iniciar sesión."
             >
               <Switch
                 checked={dobleFactor}
-                onCheckedChange={setDobleFactor}
+                onCheckedChange={alternarDosPasos}
+                disabled={cambiando2FA}
                 aria-label="Activar verificación en dos pasos"
               />
             </Fila>
           </div>
-          {dobleFactor && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Al guardar se enviará un código OTP a {}
-              <span className="font-medium">tu correo corporativo</span> para
-              confirmar la activación.
-            </p>
-          )}
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            {dobleFactor
+              ? "Se te pedirá un código al iniciar sesión con contraseña. Si entras con Microsoft, el segundo factor lo pone Entra ID."
+              : "Protege tu cuenta con un código temporal, además de la contraseña."}
+          </p>
         </section>
+
+        <DialogoDosPasos
+          key={`activar-${activando}`}
+          abierto={activando}
+          onOpenChange={setActivando}
+          onActivado={() => {
+            setDobleFactor(true)
+            notificar("Verificación en dos pasos activada.", "exito")
+          }}
+        />
+
+        {/* Desactivar tambien pide la contrasena: si alguien deja la sesion
+            abierta, no deberia poder quitarle el segundo factor a la cuenta. */}
+        <Dialog
+          open={desactivando}
+          onOpenChange={(abierto) => {
+            setDesactivando(abierto)
+            if (!abierto) {
+              setPasswordDesactivar("")
+              setErrorDesactivar(null)
+            }
+          }}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Desactivar verificación en dos pasos</DialogTitle>
+              <DialogDescription>
+                Tu cuenta quedará protegida solo con la contraseña. Confirma
+                para continuar.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="password-desactivar">Contraseña</Label>
+              <Input
+                id="password-desactivar"
+                type="password"
+                autoFocus
+                autoComplete="current-password"
+                value={passwordDesactivar}
+                onChange={(evento) => {
+                  setPasswordDesactivar(evento.target.value)
+                  setErrorDesactivar(null)
+                }}
+                aria-invalid={!!errorDesactivar}
+              />
+              {errorDesactivar && (
+                <p className="text-sm font-medium text-destructive">
+                  {errorDesactivar}
+                </p>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDesactivando(false)}
+                disabled={cambiando2FA}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={desactivarDosPasos}
+                disabled={!passwordDesactivar || cambiando2FA}
+              >
+                {cambiando2FA && (
+                  <LoaderCircleIcon className="size-4 animate-spin" />
+                )}
+                Desactivar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <section>
           <Titulo>Sesión</Titulo>

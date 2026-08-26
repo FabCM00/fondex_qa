@@ -13,6 +13,13 @@ import type { Rol } from "@/lib/auth/roles"
 const authSeed = betterAuth({
   ...opcionesAuth,
   emailAndPassword: { ...opcionesAuth.emailAndPassword, disableSignUp: false },
+  databaseHooks: {
+    ...opcionesAuth.databaseHooks,
+    // El hook de la app rechaza toda creacion de usuarios (cierra la puerta que
+    // abre el login social). Aqui crear usuarios es justamente el objetivo, y
+    // los datos vienen del entorno, no de nadie por internet.
+    user: undefined,
+  },
 })
 
 const SEMILLA: { nombre: string; email: string; password: string; rol: Rol }[] =

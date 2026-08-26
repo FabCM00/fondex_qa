@@ -36,6 +36,25 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  */
 export type Verification = $Result.DefaultSelection<Prisma.$VerificationPayload>
 /**
+ * Model TwoFactor
+ * El segundo factor de un usuario: el secreto TOTP que comparte con su app de
+ * autenticacion y los codigos de respaldo para cuando pierde el telefono.
+ * 
+ * `failedVerificationCount` y `lockedUntil` frenan la fuerza bruta contra el
+ * codigo: seis digitos se adivinan rapido si se puede intentar sin limite.
+ */
+export type TwoFactor = $Result.DefaultSelection<Prisma.$TwoFactorPayload>
+/**
+ * Model RateLimit
+ * Contador de peticiones por clave (IP + ruta). Better Auth lo usa para frenar
+ * la fuerza bruta contra el login.
+ * 
+ * Vive en la base y no en memoria porque con varias instancias cada una
+ * tendria su propio contador, y bastaria repartir los intentos entre ellas
+ * para saltarse el limite.
+ */
+export type RateLimit = $Result.DefaultSelection<Prisma.$RateLimitPayload>
+/**
  * Model valida1_results
  * 
  */
@@ -276,6 +295,26 @@ export class PrismaClient<
     * ```
     */
   get verification(): Prisma.VerificationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.twoFactor`: Exposes CRUD operations for the **TwoFactor** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TwoFactors
+    * const twoFactors = await prisma.twoFactor.findMany()
+    * ```
+    */
+  get twoFactor(): Prisma.TwoFactorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.rateLimit`: Exposes CRUD operations for the **RateLimit** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RateLimits
+    * const rateLimits = await prisma.rateLimit.findMany()
+    * ```
+    */
+  get rateLimit(): Prisma.RateLimitDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.valida1_results`: Exposes CRUD operations for the **valida1_results** model.
@@ -827,6 +866,8 @@ export namespace Prisma {
     Session: 'Session',
     Account: 'Account',
     Verification: 'Verification',
+    TwoFactor: 'TwoFactor',
+    RateLimit: 'RateLimit',
     valida1_results: 'valida1_results',
     documentos: 'documentos',
     firma_solicitudes: 'firma_solicitudes',
@@ -852,7 +893,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "account" | "verification" | "valida1_results" | "documentos" | "firma_solicitudes" | "identity_validations" | "motor_data_results" | "motor_process_results" | "motor_ejecuciones" | "credito_decisiones" | "document_results" | "datos_asociado"
+      modelProps: "user" | "session" | "account" | "verification" | "twoFactor" | "rateLimit" | "valida1_results" | "documentos" | "firma_solicitudes" | "identity_validations" | "motor_data_results" | "motor_process_results" | "motor_ejecuciones" | "credito_decisiones" | "document_results" | "datos_asociado"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1149,6 +1190,154 @@ export namespace Prisma {
           count: {
             args: Prisma.VerificationCountArgs<ExtArgs>
             result: $Utils.Optional<VerificationCountAggregateOutputType> | number
+          }
+        }
+      }
+      TwoFactor: {
+        payload: Prisma.$TwoFactorPayload<ExtArgs>
+        fields: Prisma.TwoFactorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TwoFactorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TwoFactorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          findFirst: {
+            args: Prisma.TwoFactorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TwoFactorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          findMany: {
+            args: Prisma.TwoFactorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>[]
+          }
+          create: {
+            args: Prisma.TwoFactorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          createMany: {
+            args: Prisma.TwoFactorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TwoFactorCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>[]
+          }
+          delete: {
+            args: Prisma.TwoFactorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          update: {
+            args: Prisma.TwoFactorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          deleteMany: {
+            args: Prisma.TwoFactorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TwoFactorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TwoFactorUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>[]
+          }
+          upsert: {
+            args: Prisma.TwoFactorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TwoFactorPayload>
+          }
+          aggregate: {
+            args: Prisma.TwoFactorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTwoFactor>
+          }
+          groupBy: {
+            args: Prisma.TwoFactorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TwoFactorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TwoFactorCountArgs<ExtArgs>
+            result: $Utils.Optional<TwoFactorCountAggregateOutputType> | number
+          }
+        }
+      }
+      RateLimit: {
+        payload: Prisma.$RateLimitPayload<ExtArgs>
+        fields: Prisma.RateLimitFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RateLimitFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RateLimitFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          findFirst: {
+            args: Prisma.RateLimitFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RateLimitFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          findMany: {
+            args: Prisma.RateLimitFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>[]
+          }
+          create: {
+            args: Prisma.RateLimitCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          createMany: {
+            args: Prisma.RateLimitCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RateLimitCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>[]
+          }
+          delete: {
+            args: Prisma.RateLimitDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          update: {
+            args: Prisma.RateLimitUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          deleteMany: {
+            args: Prisma.RateLimitDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RateLimitUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RateLimitUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>[]
+          }
+          upsert: {
+            args: Prisma.RateLimitUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RateLimitPayload>
+          }
+          aggregate: {
+            args: Prisma.RateLimitAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRateLimit>
+          }
+          groupBy: {
+            args: Prisma.RateLimitGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RateLimitGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RateLimitCountArgs<ExtArgs>
+            result: $Utils.Optional<RateLimitCountAggregateOutputType> | number
           }
         }
       }
@@ -2019,6 +2208,8 @@ export namespace Prisma {
     session?: SessionOmit
     account?: AccountOmit
     verification?: VerificationOmit
+    twoFactor?: TwoFactorOmit
+    rateLimit?: RateLimitOmit
     valida1_results?: valida1_resultsOmit
     documentos?: documentosOmit
     firma_solicitudes?: firma_solicitudesOmit
@@ -2111,11 +2302,13 @@ export namespace Prisma {
   export type UserCountOutputType = {
     sessions: number
     accounts: number
+    twoFactors: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+    twoFactors?: boolean | UserCountOutputTypeCountTwoFactorsArgs
   }
 
   // Custom InputTypes
@@ -2141,6 +2334,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AccountWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTwoFactorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TwoFactorWhereInput
   }
 
 
@@ -2255,6 +2455,7 @@ export namespace Prisma {
     image: string | null
     role: $Enums.Role | null
     active: boolean | null
+    twoFactorEnabled: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2267,6 +2468,7 @@ export namespace Prisma {
     image: string | null
     role: $Enums.Role | null
     active: boolean | null
+    twoFactorEnabled: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2279,6 +2481,7 @@ export namespace Prisma {
     image: number
     role: number
     active: number
+    twoFactorEnabled: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2293,6 +2496,7 @@ export namespace Prisma {
     image?: true
     role?: true
     active?: true
+    twoFactorEnabled?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2305,6 +2509,7 @@ export namespace Prisma {
     image?: true
     role?: true
     active?: true
+    twoFactorEnabled?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2317,6 +2522,7 @@ export namespace Prisma {
     image?: true
     role?: true
     active?: true
+    twoFactorEnabled?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2402,6 +2608,7 @@ export namespace Prisma {
     image: string | null
     role: $Enums.Role
     active: boolean
+    twoFactorEnabled: boolean
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2431,10 +2638,12 @@ export namespace Prisma {
     image?: boolean
     role?: boolean
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    twoFactors?: boolean | User$twoFactorsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2446,6 +2655,7 @@ export namespace Prisma {
     image?: boolean
     role?: boolean
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2458,6 +2668,7 @@ export namespace Prisma {
     image?: boolean
     role?: boolean
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2470,14 +2681,16 @@ export namespace Prisma {
     image?: boolean
     role?: boolean
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "active" | "twoFactorEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    twoFactors?: boolean | User$twoFactorsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2488,6 +2701,7 @@ export namespace Prisma {
     objects: {
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       accounts: Prisma.$AccountPayload<ExtArgs>[]
+      twoFactors: Prisma.$TwoFactorPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2497,6 +2711,11 @@ export namespace Prisma {
       image: string | null
       role: $Enums.Role
       active: boolean
+      /**
+       * Segundo factor activo. Solo aplica al login con contrasena: quien entra
+       * por Microsoft ya paso el MFA de Entra ID.
+       */
+      twoFactorEnabled: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2895,6 +3114,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    twoFactors<T extends User$twoFactorsArgs<ExtArgs> = {}>(args?: Subset<T, User$twoFactorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2931,6 +3151,7 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
     readonly active: FieldRef<"User", 'Boolean'>
+    readonly twoFactorEnabled: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -3371,6 +3592,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
+  }
+
+  /**
+   * User.twoFactors
+   */
+  export type User$twoFactorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    where?: TwoFactorWhereInput
+    orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
+    cursor?: TwoFactorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
   }
 
   /**
@@ -6687,6 +6932,2157 @@ export namespace Prisma {
      * Omit specific fields from the Verification
      */
     omit?: VerificationOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TwoFactor
+   */
+
+  export type AggregateTwoFactor = {
+    _count: TwoFactorCountAggregateOutputType | null
+    _avg: TwoFactorAvgAggregateOutputType | null
+    _sum: TwoFactorSumAggregateOutputType | null
+    _min: TwoFactorMinAggregateOutputType | null
+    _max: TwoFactorMaxAggregateOutputType | null
+  }
+
+  export type TwoFactorAvgAggregateOutputType = {
+    failedVerificationCount: number | null
+  }
+
+  export type TwoFactorSumAggregateOutputType = {
+    failedVerificationCount: number | null
+  }
+
+  export type TwoFactorMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    secret: string | null
+    backupCodes: string | null
+    verified: boolean | null
+    failedVerificationCount: number | null
+    lockedUntil: Date | null
+  }
+
+  export type TwoFactorMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    secret: string | null
+    backupCodes: string | null
+    verified: boolean | null
+    failedVerificationCount: number | null
+    lockedUntil: Date | null
+  }
+
+  export type TwoFactorCountAggregateOutputType = {
+    id: number
+    userId: number
+    secret: number
+    backupCodes: number
+    verified: number
+    failedVerificationCount: number
+    lockedUntil: number
+    _all: number
+  }
+
+
+  export type TwoFactorAvgAggregateInputType = {
+    failedVerificationCount?: true
+  }
+
+  export type TwoFactorSumAggregateInputType = {
+    failedVerificationCount?: true
+  }
+
+  export type TwoFactorMinAggregateInputType = {
+    id?: true
+    userId?: true
+    secret?: true
+    backupCodes?: true
+    verified?: true
+    failedVerificationCount?: true
+    lockedUntil?: true
+  }
+
+  export type TwoFactorMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    secret?: true
+    backupCodes?: true
+    verified?: true
+    failedVerificationCount?: true
+    lockedUntil?: true
+  }
+
+  export type TwoFactorCountAggregateInputType = {
+    id?: true
+    userId?: true
+    secret?: true
+    backupCodes?: true
+    verified?: true
+    failedVerificationCount?: true
+    lockedUntil?: true
+    _all?: true
+  }
+
+  export type TwoFactorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TwoFactor to aggregate.
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TwoFactors to fetch.
+     */
+    orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TwoFactorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TwoFactors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TwoFactors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TwoFactors
+    **/
+    _count?: true | TwoFactorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TwoFactorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TwoFactorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TwoFactorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TwoFactorMaxAggregateInputType
+  }
+
+  export type GetTwoFactorAggregateType<T extends TwoFactorAggregateArgs> = {
+        [P in keyof T & keyof AggregateTwoFactor]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTwoFactor[P]>
+      : GetScalarType<T[P], AggregateTwoFactor[P]>
+  }
+
+
+
+
+  export type TwoFactorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TwoFactorWhereInput
+    orderBy?: TwoFactorOrderByWithAggregationInput | TwoFactorOrderByWithAggregationInput[]
+    by: TwoFactorScalarFieldEnum[] | TwoFactorScalarFieldEnum
+    having?: TwoFactorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TwoFactorCountAggregateInputType | true
+    _avg?: TwoFactorAvgAggregateInputType
+    _sum?: TwoFactorSumAggregateInputType
+    _min?: TwoFactorMinAggregateInputType
+    _max?: TwoFactorMaxAggregateInputType
+  }
+
+  export type TwoFactorGroupByOutputType = {
+    id: string
+    userId: string
+    secret: string
+    backupCodes: string
+    verified: boolean
+    failedVerificationCount: number
+    lockedUntil: Date | null
+    _count: TwoFactorCountAggregateOutputType | null
+    _avg: TwoFactorAvgAggregateOutputType | null
+    _sum: TwoFactorSumAggregateOutputType | null
+    _min: TwoFactorMinAggregateOutputType | null
+    _max: TwoFactorMaxAggregateOutputType | null
+  }
+
+  type GetTwoFactorGroupByPayload<T extends TwoFactorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TwoFactorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TwoFactorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TwoFactorGroupByOutputType[P]>
+            : GetScalarType<T[P], TwoFactorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TwoFactorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    secret?: boolean
+    backupCodes?: boolean
+    verified?: boolean
+    failedVerificationCount?: boolean
+    lockedUntil?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["twoFactor"]>
+
+  export type TwoFactorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    secret?: boolean
+    backupCodes?: boolean
+    verified?: boolean
+    failedVerificationCount?: boolean
+    lockedUntil?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["twoFactor"]>
+
+  export type TwoFactorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    secret?: boolean
+    backupCodes?: boolean
+    verified?: boolean
+    failedVerificationCount?: boolean
+    lockedUntil?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["twoFactor"]>
+
+  export type TwoFactorSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    secret?: boolean
+    backupCodes?: boolean
+    verified?: boolean
+    failedVerificationCount?: boolean
+    lockedUntil?: boolean
+  }
+
+  export type TwoFactorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "secret" | "backupCodes" | "verified" | "failedVerificationCount" | "lockedUntil", ExtArgs["result"]["twoFactor"]>
+  export type TwoFactorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TwoFactorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TwoFactorIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $TwoFactorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TwoFactor"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      secret: string
+      backupCodes: string
+      verified: boolean
+      failedVerificationCount: number
+      lockedUntil: Date | null
+    }, ExtArgs["result"]["twoFactor"]>
+    composites: {}
+  }
+
+  type TwoFactorGetPayload<S extends boolean | null | undefined | TwoFactorDefaultArgs> = $Result.GetResult<Prisma.$TwoFactorPayload, S>
+
+  type TwoFactorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TwoFactorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TwoFactorCountAggregateInputType | true
+    }
+
+  export interface TwoFactorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TwoFactor'], meta: { name: 'TwoFactor' } }
+    /**
+     * Find zero or one TwoFactor that matches the filter.
+     * @param {TwoFactorFindUniqueArgs} args - Arguments to find a TwoFactor
+     * @example
+     * // Get one TwoFactor
+     * const twoFactor = await prisma.twoFactor.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TwoFactorFindUniqueArgs>(args: SelectSubset<T, TwoFactorFindUniqueArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TwoFactor that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TwoFactorFindUniqueOrThrowArgs} args - Arguments to find a TwoFactor
+     * @example
+     * // Get one TwoFactor
+     * const twoFactor = await prisma.twoFactor.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TwoFactorFindUniqueOrThrowArgs>(args: SelectSubset<T, TwoFactorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TwoFactor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorFindFirstArgs} args - Arguments to find a TwoFactor
+     * @example
+     * // Get one TwoFactor
+     * const twoFactor = await prisma.twoFactor.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TwoFactorFindFirstArgs>(args?: SelectSubset<T, TwoFactorFindFirstArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TwoFactor that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorFindFirstOrThrowArgs} args - Arguments to find a TwoFactor
+     * @example
+     * // Get one TwoFactor
+     * const twoFactor = await prisma.twoFactor.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TwoFactorFindFirstOrThrowArgs>(args?: SelectSubset<T, TwoFactorFindFirstOrThrowArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TwoFactors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TwoFactors
+     * const twoFactors = await prisma.twoFactor.findMany()
+     * 
+     * // Get first 10 TwoFactors
+     * const twoFactors = await prisma.twoFactor.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const twoFactorWithIdOnly = await prisma.twoFactor.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TwoFactorFindManyArgs>(args?: SelectSubset<T, TwoFactorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TwoFactor.
+     * @param {TwoFactorCreateArgs} args - Arguments to create a TwoFactor.
+     * @example
+     * // Create one TwoFactor
+     * const TwoFactor = await prisma.twoFactor.create({
+     *   data: {
+     *     // ... data to create a TwoFactor
+     *   }
+     * })
+     * 
+     */
+    create<T extends TwoFactorCreateArgs>(args: SelectSubset<T, TwoFactorCreateArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TwoFactors.
+     * @param {TwoFactorCreateManyArgs} args - Arguments to create many TwoFactors.
+     * @example
+     * // Create many TwoFactors
+     * const twoFactor = await prisma.twoFactor.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TwoFactorCreateManyArgs>(args?: SelectSubset<T, TwoFactorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TwoFactors and returns the data saved in the database.
+     * @param {TwoFactorCreateManyAndReturnArgs} args - Arguments to create many TwoFactors.
+     * @example
+     * // Create many TwoFactors
+     * const twoFactor = await prisma.twoFactor.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TwoFactors and only return the `id`
+     * const twoFactorWithIdOnly = await prisma.twoFactor.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TwoFactorCreateManyAndReturnArgs>(args?: SelectSubset<T, TwoFactorCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TwoFactor.
+     * @param {TwoFactorDeleteArgs} args - Arguments to delete one TwoFactor.
+     * @example
+     * // Delete one TwoFactor
+     * const TwoFactor = await prisma.twoFactor.delete({
+     *   where: {
+     *     // ... filter to delete one TwoFactor
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TwoFactorDeleteArgs>(args: SelectSubset<T, TwoFactorDeleteArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TwoFactor.
+     * @param {TwoFactorUpdateArgs} args - Arguments to update one TwoFactor.
+     * @example
+     * // Update one TwoFactor
+     * const twoFactor = await prisma.twoFactor.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TwoFactorUpdateArgs>(args: SelectSubset<T, TwoFactorUpdateArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TwoFactors.
+     * @param {TwoFactorDeleteManyArgs} args - Arguments to filter TwoFactors to delete.
+     * @example
+     * // Delete a few TwoFactors
+     * const { count } = await prisma.twoFactor.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TwoFactorDeleteManyArgs>(args?: SelectSubset<T, TwoFactorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TwoFactors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TwoFactors
+     * const twoFactor = await prisma.twoFactor.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TwoFactorUpdateManyArgs>(args: SelectSubset<T, TwoFactorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TwoFactors and returns the data updated in the database.
+     * @param {TwoFactorUpdateManyAndReturnArgs} args - Arguments to update many TwoFactors.
+     * @example
+     * // Update many TwoFactors
+     * const twoFactor = await prisma.twoFactor.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TwoFactors and only return the `id`
+     * const twoFactorWithIdOnly = await prisma.twoFactor.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TwoFactorUpdateManyAndReturnArgs>(args: SelectSubset<T, TwoFactorUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TwoFactor.
+     * @param {TwoFactorUpsertArgs} args - Arguments to update or create a TwoFactor.
+     * @example
+     * // Update or create a TwoFactor
+     * const twoFactor = await prisma.twoFactor.upsert({
+     *   create: {
+     *     // ... data to create a TwoFactor
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TwoFactor we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TwoFactorUpsertArgs>(args: SelectSubset<T, TwoFactorUpsertArgs<ExtArgs>>): Prisma__TwoFactorClient<$Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TwoFactors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorCountArgs} args - Arguments to filter TwoFactors to count.
+     * @example
+     * // Count the number of TwoFactors
+     * const count = await prisma.twoFactor.count({
+     *   where: {
+     *     // ... the filter for the TwoFactors we want to count
+     *   }
+     * })
+    **/
+    count<T extends TwoFactorCountArgs>(
+      args?: Subset<T, TwoFactorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TwoFactorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TwoFactor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TwoFactorAggregateArgs>(args: Subset<T, TwoFactorAggregateArgs>): Prisma.PrismaPromise<GetTwoFactorAggregateType<T>>
+
+    /**
+     * Group by TwoFactor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TwoFactorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TwoFactorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TwoFactorGroupByArgs['orderBy'] }
+        : { orderBy?: TwoFactorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TwoFactorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTwoFactorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TwoFactor model
+   */
+  readonly fields: TwoFactorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TwoFactor.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TwoFactorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TwoFactor model
+   */
+  interface TwoFactorFieldRefs {
+    readonly id: FieldRef<"TwoFactor", 'String'>
+    readonly userId: FieldRef<"TwoFactor", 'String'>
+    readonly secret: FieldRef<"TwoFactor", 'String'>
+    readonly backupCodes: FieldRef<"TwoFactor", 'String'>
+    readonly verified: FieldRef<"TwoFactor", 'Boolean'>
+    readonly failedVerificationCount: FieldRef<"TwoFactor", 'Int'>
+    readonly lockedUntil: FieldRef<"TwoFactor", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TwoFactor findUnique
+   */
+  export type TwoFactorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter, which TwoFactor to fetch.
+     */
+    where: TwoFactorWhereUniqueInput
+  }
+
+  /**
+   * TwoFactor findUniqueOrThrow
+   */
+  export type TwoFactorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter, which TwoFactor to fetch.
+     */
+    where: TwoFactorWhereUniqueInput
+  }
+
+  /**
+   * TwoFactor findFirst
+   */
+  export type TwoFactorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter, which TwoFactor to fetch.
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TwoFactors to fetch.
+     */
+    orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TwoFactors.
+     */
+    cursor?: TwoFactorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TwoFactors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TwoFactors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TwoFactors.
+     */
+    distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
+  }
+
+  /**
+   * TwoFactor findFirstOrThrow
+   */
+  export type TwoFactorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter, which TwoFactor to fetch.
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TwoFactors to fetch.
+     */
+    orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TwoFactors.
+     */
+    cursor?: TwoFactorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TwoFactors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TwoFactors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TwoFactors.
+     */
+    distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
+  }
+
+  /**
+   * TwoFactor findMany
+   */
+  export type TwoFactorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter, which TwoFactors to fetch.
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TwoFactors to fetch.
+     */
+    orderBy?: TwoFactorOrderByWithRelationInput | TwoFactorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TwoFactors.
+     */
+    cursor?: TwoFactorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TwoFactors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TwoFactors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TwoFactors.
+     */
+    distinct?: TwoFactorScalarFieldEnum | TwoFactorScalarFieldEnum[]
+  }
+
+  /**
+   * TwoFactor create
+   */
+  export type TwoFactorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TwoFactor.
+     */
+    data: XOR<TwoFactorCreateInput, TwoFactorUncheckedCreateInput>
+  }
+
+  /**
+   * TwoFactor createMany
+   */
+  export type TwoFactorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TwoFactors.
+     */
+    data: TwoFactorCreateManyInput | TwoFactorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TwoFactor createManyAndReturn
+   */
+  export type TwoFactorCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * The data used to create many TwoFactors.
+     */
+    data: TwoFactorCreateManyInput | TwoFactorCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TwoFactor update
+   */
+  export type TwoFactorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TwoFactor.
+     */
+    data: XOR<TwoFactorUpdateInput, TwoFactorUncheckedUpdateInput>
+    /**
+     * Choose, which TwoFactor to update.
+     */
+    where: TwoFactorWhereUniqueInput
+  }
+
+  /**
+   * TwoFactor updateMany
+   */
+  export type TwoFactorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TwoFactors.
+     */
+    data: XOR<TwoFactorUpdateManyMutationInput, TwoFactorUncheckedUpdateManyInput>
+    /**
+     * Filter which TwoFactors to update
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * Limit how many TwoFactors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TwoFactor updateManyAndReturn
+   */
+  export type TwoFactorUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * The data used to update TwoFactors.
+     */
+    data: XOR<TwoFactorUpdateManyMutationInput, TwoFactorUncheckedUpdateManyInput>
+    /**
+     * Filter which TwoFactors to update
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * Limit how many TwoFactors to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TwoFactor upsert
+   */
+  export type TwoFactorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TwoFactor to update in case it exists.
+     */
+    where: TwoFactorWhereUniqueInput
+    /**
+     * In case the TwoFactor found by the `where` argument doesn't exist, create a new TwoFactor with this data.
+     */
+    create: XOR<TwoFactorCreateInput, TwoFactorUncheckedCreateInput>
+    /**
+     * In case the TwoFactor was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TwoFactorUpdateInput, TwoFactorUncheckedUpdateInput>
+  }
+
+  /**
+   * TwoFactor delete
+   */
+  export type TwoFactorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+    /**
+     * Filter which TwoFactor to delete.
+     */
+    where: TwoFactorWhereUniqueInput
+  }
+
+  /**
+   * TwoFactor deleteMany
+   */
+  export type TwoFactorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TwoFactors to delete
+     */
+    where?: TwoFactorWhereInput
+    /**
+     * Limit how many TwoFactors to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TwoFactor without action
+   */
+  export type TwoFactorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TwoFactor
+     */
+    select?: TwoFactorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TwoFactor
+     */
+    omit?: TwoFactorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TwoFactorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RateLimit
+   */
+
+  export type AggregateRateLimit = {
+    _count: RateLimitCountAggregateOutputType | null
+    _avg: RateLimitAvgAggregateOutputType | null
+    _sum: RateLimitSumAggregateOutputType | null
+    _min: RateLimitMinAggregateOutputType | null
+    _max: RateLimitMaxAggregateOutputType | null
+  }
+
+  export type RateLimitAvgAggregateOutputType = {
+    count: number | null
+    lastRequest: number | null
+  }
+
+  export type RateLimitSumAggregateOutputType = {
+    count: number | null
+    lastRequest: bigint | null
+  }
+
+  export type RateLimitMinAggregateOutputType = {
+    id: string | null
+    key: string | null
+    count: number | null
+    lastRequest: bigint | null
+  }
+
+  export type RateLimitMaxAggregateOutputType = {
+    id: string | null
+    key: string | null
+    count: number | null
+    lastRequest: bigint | null
+  }
+
+  export type RateLimitCountAggregateOutputType = {
+    id: number
+    key: number
+    count: number
+    lastRequest: number
+    _all: number
+  }
+
+
+  export type RateLimitAvgAggregateInputType = {
+    count?: true
+    lastRequest?: true
+  }
+
+  export type RateLimitSumAggregateInputType = {
+    count?: true
+    lastRequest?: true
+  }
+
+  export type RateLimitMinAggregateInputType = {
+    id?: true
+    key?: true
+    count?: true
+    lastRequest?: true
+  }
+
+  export type RateLimitMaxAggregateInputType = {
+    id?: true
+    key?: true
+    count?: true
+    lastRequest?: true
+  }
+
+  export type RateLimitCountAggregateInputType = {
+    id?: true
+    key?: true
+    count?: true
+    lastRequest?: true
+    _all?: true
+  }
+
+  export type RateLimitAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RateLimit to aggregate.
+     */
+    where?: RateLimitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RateLimits to fetch.
+     */
+    orderBy?: RateLimitOrderByWithRelationInput | RateLimitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RateLimitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RateLimits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RateLimits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RateLimits
+    **/
+    _count?: true | RateLimitCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RateLimitAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RateLimitSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RateLimitMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RateLimitMaxAggregateInputType
+  }
+
+  export type GetRateLimitAggregateType<T extends RateLimitAggregateArgs> = {
+        [P in keyof T & keyof AggregateRateLimit]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRateLimit[P]>
+      : GetScalarType<T[P], AggregateRateLimit[P]>
+  }
+
+
+
+
+  export type RateLimitGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RateLimitWhereInput
+    orderBy?: RateLimitOrderByWithAggregationInput | RateLimitOrderByWithAggregationInput[]
+    by: RateLimitScalarFieldEnum[] | RateLimitScalarFieldEnum
+    having?: RateLimitScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RateLimitCountAggregateInputType | true
+    _avg?: RateLimitAvgAggregateInputType
+    _sum?: RateLimitSumAggregateInputType
+    _min?: RateLimitMinAggregateInputType
+    _max?: RateLimitMaxAggregateInputType
+  }
+
+  export type RateLimitGroupByOutputType = {
+    id: string
+    key: string
+    count: number
+    lastRequest: bigint
+    _count: RateLimitCountAggregateOutputType | null
+    _avg: RateLimitAvgAggregateOutputType | null
+    _sum: RateLimitSumAggregateOutputType | null
+    _min: RateLimitMinAggregateOutputType | null
+    _max: RateLimitMaxAggregateOutputType | null
+  }
+
+  type GetRateLimitGroupByPayload<T extends RateLimitGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RateLimitGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RateLimitGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RateLimitGroupByOutputType[P]>
+            : GetScalarType<T[P], RateLimitGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RateLimitSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    count?: boolean
+    lastRequest?: boolean
+  }, ExtArgs["result"]["rateLimit"]>
+
+  export type RateLimitSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    count?: boolean
+    lastRequest?: boolean
+  }, ExtArgs["result"]["rateLimit"]>
+
+  export type RateLimitSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    count?: boolean
+    lastRequest?: boolean
+  }, ExtArgs["result"]["rateLimit"]>
+
+  export type RateLimitSelectScalar = {
+    id?: boolean
+    key?: boolean
+    count?: boolean
+    lastRequest?: boolean
+  }
+
+  export type RateLimitOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "count" | "lastRequest", ExtArgs["result"]["rateLimit"]>
+
+  export type $RateLimitPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RateLimit"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      key: string
+      count: number
+      /**
+       * Epoch en milisegundos, no DateTime: asi lo escribe Better Auth.
+       */
+      lastRequest: bigint
+    }, ExtArgs["result"]["rateLimit"]>
+    composites: {}
+  }
+
+  type RateLimitGetPayload<S extends boolean | null | undefined | RateLimitDefaultArgs> = $Result.GetResult<Prisma.$RateLimitPayload, S>
+
+  type RateLimitCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RateLimitFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RateLimitCountAggregateInputType | true
+    }
+
+  export interface RateLimitDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RateLimit'], meta: { name: 'RateLimit' } }
+    /**
+     * Find zero or one RateLimit that matches the filter.
+     * @param {RateLimitFindUniqueArgs} args - Arguments to find a RateLimit
+     * @example
+     * // Get one RateLimit
+     * const rateLimit = await prisma.rateLimit.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RateLimitFindUniqueArgs>(args: SelectSubset<T, RateLimitFindUniqueArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RateLimit that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RateLimitFindUniqueOrThrowArgs} args - Arguments to find a RateLimit
+     * @example
+     * // Get one RateLimit
+     * const rateLimit = await prisma.rateLimit.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RateLimitFindUniqueOrThrowArgs>(args: SelectSubset<T, RateLimitFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RateLimit that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitFindFirstArgs} args - Arguments to find a RateLimit
+     * @example
+     * // Get one RateLimit
+     * const rateLimit = await prisma.rateLimit.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RateLimitFindFirstArgs>(args?: SelectSubset<T, RateLimitFindFirstArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RateLimit that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitFindFirstOrThrowArgs} args - Arguments to find a RateLimit
+     * @example
+     * // Get one RateLimit
+     * const rateLimit = await prisma.rateLimit.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RateLimitFindFirstOrThrowArgs>(args?: SelectSubset<T, RateLimitFindFirstOrThrowArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RateLimits that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RateLimits
+     * const rateLimits = await prisma.rateLimit.findMany()
+     * 
+     * // Get first 10 RateLimits
+     * const rateLimits = await prisma.rateLimit.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const rateLimitWithIdOnly = await prisma.rateLimit.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RateLimitFindManyArgs>(args?: SelectSubset<T, RateLimitFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RateLimit.
+     * @param {RateLimitCreateArgs} args - Arguments to create a RateLimit.
+     * @example
+     * // Create one RateLimit
+     * const RateLimit = await prisma.rateLimit.create({
+     *   data: {
+     *     // ... data to create a RateLimit
+     *   }
+     * })
+     * 
+     */
+    create<T extends RateLimitCreateArgs>(args: SelectSubset<T, RateLimitCreateArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RateLimits.
+     * @param {RateLimitCreateManyArgs} args - Arguments to create many RateLimits.
+     * @example
+     * // Create many RateLimits
+     * const rateLimit = await prisma.rateLimit.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RateLimitCreateManyArgs>(args?: SelectSubset<T, RateLimitCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RateLimits and returns the data saved in the database.
+     * @param {RateLimitCreateManyAndReturnArgs} args - Arguments to create many RateLimits.
+     * @example
+     * // Create many RateLimits
+     * const rateLimit = await prisma.rateLimit.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RateLimits and only return the `id`
+     * const rateLimitWithIdOnly = await prisma.rateLimit.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RateLimitCreateManyAndReturnArgs>(args?: SelectSubset<T, RateLimitCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RateLimit.
+     * @param {RateLimitDeleteArgs} args - Arguments to delete one RateLimit.
+     * @example
+     * // Delete one RateLimit
+     * const RateLimit = await prisma.rateLimit.delete({
+     *   where: {
+     *     // ... filter to delete one RateLimit
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RateLimitDeleteArgs>(args: SelectSubset<T, RateLimitDeleteArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RateLimit.
+     * @param {RateLimitUpdateArgs} args - Arguments to update one RateLimit.
+     * @example
+     * // Update one RateLimit
+     * const rateLimit = await prisma.rateLimit.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RateLimitUpdateArgs>(args: SelectSubset<T, RateLimitUpdateArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RateLimits.
+     * @param {RateLimitDeleteManyArgs} args - Arguments to filter RateLimits to delete.
+     * @example
+     * // Delete a few RateLimits
+     * const { count } = await prisma.rateLimit.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RateLimitDeleteManyArgs>(args?: SelectSubset<T, RateLimitDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RateLimits.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RateLimits
+     * const rateLimit = await prisma.rateLimit.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RateLimitUpdateManyArgs>(args: SelectSubset<T, RateLimitUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RateLimits and returns the data updated in the database.
+     * @param {RateLimitUpdateManyAndReturnArgs} args - Arguments to update many RateLimits.
+     * @example
+     * // Update many RateLimits
+     * const rateLimit = await prisma.rateLimit.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RateLimits and only return the `id`
+     * const rateLimitWithIdOnly = await prisma.rateLimit.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RateLimitUpdateManyAndReturnArgs>(args: SelectSubset<T, RateLimitUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RateLimit.
+     * @param {RateLimitUpsertArgs} args - Arguments to update or create a RateLimit.
+     * @example
+     * // Update or create a RateLimit
+     * const rateLimit = await prisma.rateLimit.upsert({
+     *   create: {
+     *     // ... data to create a RateLimit
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RateLimit we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RateLimitUpsertArgs>(args: SelectSubset<T, RateLimitUpsertArgs<ExtArgs>>): Prisma__RateLimitClient<$Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RateLimits.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitCountArgs} args - Arguments to filter RateLimits to count.
+     * @example
+     * // Count the number of RateLimits
+     * const count = await prisma.rateLimit.count({
+     *   where: {
+     *     // ... the filter for the RateLimits we want to count
+     *   }
+     * })
+    **/
+    count<T extends RateLimitCountArgs>(
+      args?: Subset<T, RateLimitCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RateLimitCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RateLimit.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RateLimitAggregateArgs>(args: Subset<T, RateLimitAggregateArgs>): Prisma.PrismaPromise<GetRateLimitAggregateType<T>>
+
+    /**
+     * Group by RateLimit.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RateLimitGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RateLimitGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RateLimitGroupByArgs['orderBy'] }
+        : { orderBy?: RateLimitGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RateLimitGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRateLimitGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RateLimit model
+   */
+  readonly fields: RateLimitFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RateLimit.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RateLimitClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RateLimit model
+   */
+  interface RateLimitFieldRefs {
+    readonly id: FieldRef<"RateLimit", 'String'>
+    readonly key: FieldRef<"RateLimit", 'String'>
+    readonly count: FieldRef<"RateLimit", 'Int'>
+    readonly lastRequest: FieldRef<"RateLimit", 'BigInt'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RateLimit findUnique
+   */
+  export type RateLimitFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter, which RateLimit to fetch.
+     */
+    where: RateLimitWhereUniqueInput
+  }
+
+  /**
+   * RateLimit findUniqueOrThrow
+   */
+  export type RateLimitFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter, which RateLimit to fetch.
+     */
+    where: RateLimitWhereUniqueInput
+  }
+
+  /**
+   * RateLimit findFirst
+   */
+  export type RateLimitFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter, which RateLimit to fetch.
+     */
+    where?: RateLimitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RateLimits to fetch.
+     */
+    orderBy?: RateLimitOrderByWithRelationInput | RateLimitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RateLimits.
+     */
+    cursor?: RateLimitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RateLimits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RateLimits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RateLimits.
+     */
+    distinct?: RateLimitScalarFieldEnum | RateLimitScalarFieldEnum[]
+  }
+
+  /**
+   * RateLimit findFirstOrThrow
+   */
+  export type RateLimitFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter, which RateLimit to fetch.
+     */
+    where?: RateLimitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RateLimits to fetch.
+     */
+    orderBy?: RateLimitOrderByWithRelationInput | RateLimitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RateLimits.
+     */
+    cursor?: RateLimitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RateLimits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RateLimits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RateLimits.
+     */
+    distinct?: RateLimitScalarFieldEnum | RateLimitScalarFieldEnum[]
+  }
+
+  /**
+   * RateLimit findMany
+   */
+  export type RateLimitFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter, which RateLimits to fetch.
+     */
+    where?: RateLimitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RateLimits to fetch.
+     */
+    orderBy?: RateLimitOrderByWithRelationInput | RateLimitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RateLimits.
+     */
+    cursor?: RateLimitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RateLimits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RateLimits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RateLimits.
+     */
+    distinct?: RateLimitScalarFieldEnum | RateLimitScalarFieldEnum[]
+  }
+
+  /**
+   * RateLimit create
+   */
+  export type RateLimitCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * The data needed to create a RateLimit.
+     */
+    data: XOR<RateLimitCreateInput, RateLimitUncheckedCreateInput>
+  }
+
+  /**
+   * RateLimit createMany
+   */
+  export type RateLimitCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RateLimits.
+     */
+    data: RateLimitCreateManyInput | RateLimitCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RateLimit createManyAndReturn
+   */
+  export type RateLimitCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * The data used to create many RateLimits.
+     */
+    data: RateLimitCreateManyInput | RateLimitCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RateLimit update
+   */
+  export type RateLimitUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * The data needed to update a RateLimit.
+     */
+    data: XOR<RateLimitUpdateInput, RateLimitUncheckedUpdateInput>
+    /**
+     * Choose, which RateLimit to update.
+     */
+    where: RateLimitWhereUniqueInput
+  }
+
+  /**
+   * RateLimit updateMany
+   */
+  export type RateLimitUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RateLimits.
+     */
+    data: XOR<RateLimitUpdateManyMutationInput, RateLimitUncheckedUpdateManyInput>
+    /**
+     * Filter which RateLimits to update
+     */
+    where?: RateLimitWhereInput
+    /**
+     * Limit how many RateLimits to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RateLimit updateManyAndReturn
+   */
+  export type RateLimitUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * The data used to update RateLimits.
+     */
+    data: XOR<RateLimitUpdateManyMutationInput, RateLimitUncheckedUpdateManyInput>
+    /**
+     * Filter which RateLimits to update
+     */
+    where?: RateLimitWhereInput
+    /**
+     * Limit how many RateLimits to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RateLimit upsert
+   */
+  export type RateLimitUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * The filter to search for the RateLimit to update in case it exists.
+     */
+    where: RateLimitWhereUniqueInput
+    /**
+     * In case the RateLimit found by the `where` argument doesn't exist, create a new RateLimit with this data.
+     */
+    create: XOR<RateLimitCreateInput, RateLimitUncheckedCreateInput>
+    /**
+     * In case the RateLimit was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RateLimitUpdateInput, RateLimitUncheckedUpdateInput>
+  }
+
+  /**
+   * RateLimit delete
+   */
+  export type RateLimitDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
+    /**
+     * Filter which RateLimit to delete.
+     */
+    where: RateLimitWhereUniqueInput
+  }
+
+  /**
+   * RateLimit deleteMany
+   */
+  export type RateLimitDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RateLimits to delete
+     */
+    where?: RateLimitWhereInput
+    /**
+     * Limit how many RateLimits to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RateLimit without action
+   */
+  export type RateLimitDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RateLimit
+     */
+    select?: RateLimitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RateLimit
+     */
+    omit?: RateLimitOmit<ExtArgs> | null
   }
 
 
@@ -18728,6 +21124,7 @@ export namespace Prisma {
     image: 'image',
     role: 'role',
     active: 'active',
+    twoFactorEnabled: 'twoFactorEnabled',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -18779,6 +21176,29 @@ export namespace Prisma {
   };
 
   export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+  export const TwoFactorScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    secret: 'secret',
+    backupCodes: 'backupCodes',
+    verified: 'verified',
+    failedVerificationCount: 'failedVerificationCount',
+    lockedUntil: 'lockedUntil'
+  };
+
+  export type TwoFactorScalarFieldEnum = (typeof TwoFactorScalarFieldEnum)[keyof typeof TwoFactorScalarFieldEnum]
+
+
+  export const RateLimitScalarFieldEnum: {
+    id: 'id',
+    key: 'key',
+    count: 'count',
+    lastRequest: 'lastRequest'
+  };
+
+  export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
 
 
   export const Valida1_resultsScalarFieldEnum: {
@@ -19050,6 +21470,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'BigInt'
    */
   export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
@@ -19074,20 +21508,6 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -19133,10 +21553,12 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
     active?: BoolFilter<"User"> | boolean
+    twoFactorEnabled?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
+    twoFactors?: TwoFactorListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -19147,10 +21569,12 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     role?: SortOrder
     active?: SortOrder
+    twoFactorEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
+    twoFactors?: TwoFactorOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -19164,10 +21588,12 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     role?: EnumRoleFilter<"User"> | $Enums.Role
     active?: BoolFilter<"User"> | boolean
+    twoFactorEnabled?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
+    twoFactors?: TwoFactorListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -19178,6 +21604,7 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     role?: SortOrder
     active?: SortOrder
+    twoFactorEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -19196,6 +21623,7 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     active?: BoolWithAggregatesFilter<"User"> | boolean
+    twoFactorEnabled?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -19426,6 +21854,122 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"Verification"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"Verification"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Verification"> | Date | string
+  }
+
+  export type TwoFactorWhereInput = {
+    AND?: TwoFactorWhereInput | TwoFactorWhereInput[]
+    OR?: TwoFactorWhereInput[]
+    NOT?: TwoFactorWhereInput | TwoFactorWhereInput[]
+    id?: StringFilter<"TwoFactor"> | string
+    userId?: StringFilter<"TwoFactor"> | string
+    secret?: StringFilter<"TwoFactor"> | string
+    backupCodes?: StringFilter<"TwoFactor"> | string
+    verified?: BoolFilter<"TwoFactor"> | boolean
+    failedVerificationCount?: IntFilter<"TwoFactor"> | number
+    lockedUntil?: DateTimeNullableFilter<"TwoFactor"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type TwoFactorOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    secret?: SortOrder
+    backupCodes?: SortOrder
+    verified?: SortOrder
+    failedVerificationCount?: SortOrder
+    lockedUntil?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type TwoFactorWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TwoFactorWhereInput | TwoFactorWhereInput[]
+    OR?: TwoFactorWhereInput[]
+    NOT?: TwoFactorWhereInput | TwoFactorWhereInput[]
+    userId?: StringFilter<"TwoFactor"> | string
+    secret?: StringFilter<"TwoFactor"> | string
+    backupCodes?: StringFilter<"TwoFactor"> | string
+    verified?: BoolFilter<"TwoFactor"> | boolean
+    failedVerificationCount?: IntFilter<"TwoFactor"> | number
+    lockedUntil?: DateTimeNullableFilter<"TwoFactor"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type TwoFactorOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    secret?: SortOrder
+    backupCodes?: SortOrder
+    verified?: SortOrder
+    failedVerificationCount?: SortOrder
+    lockedUntil?: SortOrderInput | SortOrder
+    _count?: TwoFactorCountOrderByAggregateInput
+    _avg?: TwoFactorAvgOrderByAggregateInput
+    _max?: TwoFactorMaxOrderByAggregateInput
+    _min?: TwoFactorMinOrderByAggregateInput
+    _sum?: TwoFactorSumOrderByAggregateInput
+  }
+
+  export type TwoFactorScalarWhereWithAggregatesInput = {
+    AND?: TwoFactorScalarWhereWithAggregatesInput | TwoFactorScalarWhereWithAggregatesInput[]
+    OR?: TwoFactorScalarWhereWithAggregatesInput[]
+    NOT?: TwoFactorScalarWhereWithAggregatesInput | TwoFactorScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TwoFactor"> | string
+    userId?: StringWithAggregatesFilter<"TwoFactor"> | string
+    secret?: StringWithAggregatesFilter<"TwoFactor"> | string
+    backupCodes?: StringWithAggregatesFilter<"TwoFactor"> | string
+    verified?: BoolWithAggregatesFilter<"TwoFactor"> | boolean
+    failedVerificationCount?: IntWithAggregatesFilter<"TwoFactor"> | number
+    lockedUntil?: DateTimeNullableWithAggregatesFilter<"TwoFactor"> | Date | string | null
+  }
+
+  export type RateLimitWhereInput = {
+    AND?: RateLimitWhereInput | RateLimitWhereInput[]
+    OR?: RateLimitWhereInput[]
+    NOT?: RateLimitWhereInput | RateLimitWhereInput[]
+    id?: StringFilter<"RateLimit"> | string
+    key?: StringFilter<"RateLimit"> | string
+    count?: IntFilter<"RateLimit"> | number
+    lastRequest?: BigIntFilter<"RateLimit"> | bigint | number
+  }
+
+  export type RateLimitOrderByWithRelationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type RateLimitWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    key?: string
+    AND?: RateLimitWhereInput | RateLimitWhereInput[]
+    OR?: RateLimitWhereInput[]
+    NOT?: RateLimitWhereInput | RateLimitWhereInput[]
+    count?: IntFilter<"RateLimit"> | number
+    lastRequest?: BigIntFilter<"RateLimit"> | bigint | number
+  }, "id" | "key">
+
+  export type RateLimitOrderByWithAggregationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    count?: SortOrder
+    lastRequest?: SortOrder
+    _count?: RateLimitCountOrderByAggregateInput
+    _avg?: RateLimitAvgOrderByAggregateInput
+    _max?: RateLimitMaxOrderByAggregateInput
+    _min?: RateLimitMinOrderByAggregateInput
+    _sum?: RateLimitSumOrderByAggregateInput
+  }
+
+  export type RateLimitScalarWhereWithAggregatesInput = {
+    AND?: RateLimitScalarWhereWithAggregatesInput | RateLimitScalarWhereWithAggregatesInput[]
+    OR?: RateLimitScalarWhereWithAggregatesInput[]
+    NOT?: RateLimitScalarWhereWithAggregatesInput | RateLimitScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RateLimit"> | string
+    key?: StringWithAggregatesFilter<"RateLimit"> | string
+    count?: IntWithAggregatesFilter<"RateLimit"> | number
+    lastRequest?: BigIntWithAggregatesFilter<"RateLimit"> | bigint | number
   }
 
   export type valida1_resultsWhereInput = {
@@ -20340,10 +22884,12 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -20354,10 +22900,12 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -20368,10 +22916,12 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -20382,10 +22932,12 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -20396,6 +22948,7 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20408,6 +22961,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20420,6 +22974,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20679,6 +23234,124 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TwoFactorCreateInput = {
+    id?: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+    user: UserCreateNestedOneWithoutTwoFactorsInput
+  }
+
+  export type TwoFactorUncheckedCreateInput = {
+    id?: string
+    userId: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+  }
+
+  export type TwoFactorUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutTwoFactorsNestedInput
+  }
+
+  export type TwoFactorUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TwoFactorCreateManyInput = {
+    id?: string
+    userId: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+  }
+
+  export type TwoFactorUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TwoFactorUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type RateLimitCreateInput = {
+    id?: string
+    key: string
+    count: number
+    lastRequest: bigint | number
+  }
+
+  export type RateLimitUncheckedCreateInput = {
+    id?: string
+    key: string
+    count: number
+    lastRequest: bigint | number
+  }
+
+  export type RateLimitUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    lastRequest?: BigIntFieldUpdateOperationsInput | bigint | number
+  }
+
+  export type RateLimitUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    lastRequest?: BigIntFieldUpdateOperationsInput | bigint | number
+  }
+
+  export type RateLimitCreateManyInput = {
+    id?: string
+    key: string
+    count: number
+    lastRequest: bigint | number
+  }
+
+  export type RateLimitUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    lastRequest?: BigIntFieldUpdateOperationsInput | bigint | number
+  }
+
+  export type RateLimitUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    count?: IntFieldUpdateOperationsInput | number
+    lastRequest?: BigIntFieldUpdateOperationsInput | bigint | number
   }
 
   export type valida1_resultsCreateInput = {
@@ -21771,6 +24444,12 @@ export namespace Prisma {
     none?: AccountWhereInput
   }
 
+  export type TwoFactorListRelationFilter = {
+    every?: TwoFactorWhereInput
+    some?: TwoFactorWhereInput
+    none?: TwoFactorWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -21784,6 +24463,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type TwoFactorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -21792,6 +24475,7 @@ export namespace Prisma {
     image?: SortOrder
     role?: SortOrder
     active?: SortOrder
+    twoFactorEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21804,6 +24488,7 @@ export namespace Prisma {
     image?: SortOrder
     role?: SortOrder
     active?: SortOrder
+    twoFactorEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -21816,6 +24501,7 @@ export namespace Prisma {
     image?: SortOrder
     role?: SortOrder
     active?: SortOrder
+    twoFactorEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22034,6 +24720,71 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type TwoFactorCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    secret?: SortOrder
+    backupCodes?: SortOrder
+    verified?: SortOrder
+    failedVerificationCount?: SortOrder
+    lockedUntil?: SortOrder
+  }
+
+  export type TwoFactorAvgOrderByAggregateInput = {
+    failedVerificationCount?: SortOrder
+  }
+
+  export type TwoFactorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    secret?: SortOrder
+    backupCodes?: SortOrder
+    verified?: SortOrder
+    failedVerificationCount?: SortOrder
+    lockedUntil?: SortOrder
+  }
+
+  export type TwoFactorMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    secret?: SortOrder
+    backupCodes?: SortOrder
+    verified?: SortOrder
+    failedVerificationCount?: SortOrder
+    lockedUntil?: SortOrder
+  }
+
+  export type TwoFactorSumOrderByAggregateInput = {
+    failedVerificationCount?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type BigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -22043,6 +24794,53 @@ export namespace Prisma {
     gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type RateLimitCountOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type RateLimitAvgOrderByAggregateInput = {
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type RateLimitMaxOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type RateLimitMinOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type RateLimitSumOrderByAggregateInput = {
+    count?: SortOrder
+    lastRequest?: SortOrder
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22173,22 +24971,6 @@ export namespace Prisma {
 
   export type valida1_resultsSumOrderByAggregateInput = {
     id?: SortOrder
-  }
-
-  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    notIn?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
-    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
-    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedBigIntFilter<$PrismaModel>
-    _min?: NestedBigIntFilter<$PrismaModel>
-    _max?: NestedBigIntFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22791,6 +25573,13 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
+  export type TwoFactorCreateNestedManyWithoutUserInput = {
+    create?: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput> | TwoFactorCreateWithoutUserInput[] | TwoFactorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TwoFactorCreateOrConnectWithoutUserInput | TwoFactorCreateOrConnectWithoutUserInput[]
+    createMany?: TwoFactorCreateManyUserInputEnvelope
+    connect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+  }
+
   export type SessionUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -22803,6 +25592,13 @@ export namespace Prisma {
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
     createMany?: AccountCreateManyUserInputEnvelope
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  }
+
+  export type TwoFactorUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput> | TwoFactorCreateWithoutUserInput[] | TwoFactorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TwoFactorCreateOrConnectWithoutUserInput | TwoFactorCreateOrConnectWithoutUserInput[]
+    createMany?: TwoFactorCreateManyUserInputEnvelope
+    connect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -22853,6 +25649,20 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type TwoFactorUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput> | TwoFactorCreateWithoutUserInput[] | TwoFactorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TwoFactorCreateOrConnectWithoutUserInput | TwoFactorCreateOrConnectWithoutUserInput[]
+    upsert?: TwoFactorUpsertWithWhereUniqueWithoutUserInput | TwoFactorUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TwoFactorCreateManyUserInputEnvelope
+    set?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    disconnect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    delete?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    connect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    update?: TwoFactorUpdateWithWhereUniqueWithoutUserInput | TwoFactorUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TwoFactorUpdateManyWithWhereWithoutUserInput | TwoFactorUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TwoFactorScalarWhereInput | TwoFactorScalarWhereInput[]
+  }
+
   export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -22879,6 +25689,20 @@ export namespace Prisma {
     update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  }
+
+  export type TwoFactorUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput> | TwoFactorCreateWithoutUserInput[] | TwoFactorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TwoFactorCreateOrConnectWithoutUserInput | TwoFactorCreateOrConnectWithoutUserInput[]
+    upsert?: TwoFactorUpsertWithWhereUniqueWithoutUserInput | TwoFactorUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TwoFactorCreateManyUserInputEnvelope
+    set?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    disconnect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    delete?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    connect?: TwoFactorWhereUniqueInput | TwoFactorWhereUniqueInput[]
+    update?: TwoFactorUpdateWithWhereUniqueWithoutUserInput | TwoFactorUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TwoFactorUpdateManyWithWhereWithoutUserInput | TwoFactorUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TwoFactorScalarWhereInput | TwoFactorScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -22911,6 +25735,36 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutAccountsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAccountsInput, UserUpdateWithoutAccountsInput>, UserUncheckedUpdateWithoutAccountsInput>
+  }
+
+  export type UserCreateNestedOneWithoutTwoFactorsInput = {
+    create?: XOR<UserCreateWithoutTwoFactorsInput, UserUncheckedCreateWithoutTwoFactorsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTwoFactorsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type UserUpdateOneRequiredWithoutTwoFactorsNestedInput = {
+    create?: XOR<UserCreateWithoutTwoFactorsInput, UserUncheckedCreateWithoutTwoFactorsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTwoFactorsInput
+    upsert?: UserUpsertWithoutTwoFactorsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTwoFactorsInput, UserUpdateWithoutTwoFactorsInput>, UserUncheckedUpdateWithoutTwoFactorsInput>
+  }
+
+  export type BigIntFieldUpdateOperationsInput = {
+    set?: bigint | number
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
   }
 
   export type credito_decisionesCreateNestedOneWithoutValida1_resultsInput = {
@@ -23003,14 +25857,6 @@ export namespace Prisma {
     connectOrCreate?: motor_ejecucionesCreateOrConnectWithoutValida1_resultsInput | motor_ejecucionesCreateOrConnectWithoutValida1_resultsInput[]
     createMany?: motor_ejecucionesCreateManyValida1_resultsInputEnvelope
     connect?: motor_ejecucionesWhereUniqueInput | motor_ejecucionesWhereUniqueInput[]
-  }
-
-  export type BigIntFieldUpdateOperationsInput = {
-    set?: bigint | number
-    increment?: bigint | number
-    decrement?: bigint | number
-    multiply?: bigint | number
-    divide?: bigint | number
   }
 
   export type credito_decisionesUpdateOneWithoutValida1_resultsNestedInput = {
@@ -23533,6 +26379,33 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type NestedBigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[] | ListBigIntFieldRefInput<$PrismaModel>
@@ -23558,17 +26431,6 @@ export namespace Prisma {
     _sum?: NestedBigIntFilter<$PrismaModel>
     _min?: NestedBigIntFilter<$PrismaModel>
     _max?: NestedBigIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -23747,6 +26609,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TwoFactorCreateWithoutUserInput = {
+    id?: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+  }
+
+  export type TwoFactorUncheckedCreateWithoutUserInput = {
+    id?: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+  }
+
+  export type TwoFactorCreateOrConnectWithoutUserInput = {
+    where: TwoFactorWhereUniqueInput
+    create: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput>
+  }
+
+  export type TwoFactorCreateManyUserInputEnvelope = {
+    data: TwoFactorCreateManyUserInput | TwoFactorCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SessionUpsertWithWhereUniqueWithoutUserInput = {
     where: SessionWhereUniqueInput
     update: XOR<SessionUpdateWithoutUserInput, SessionUncheckedUpdateWithoutUserInput>
@@ -23813,6 +26703,35 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Account"> | Date | string
   }
 
+  export type TwoFactorUpsertWithWhereUniqueWithoutUserInput = {
+    where: TwoFactorWhereUniqueInput
+    update: XOR<TwoFactorUpdateWithoutUserInput, TwoFactorUncheckedUpdateWithoutUserInput>
+    create: XOR<TwoFactorCreateWithoutUserInput, TwoFactorUncheckedCreateWithoutUserInput>
+  }
+
+  export type TwoFactorUpdateWithWhereUniqueWithoutUserInput = {
+    where: TwoFactorWhereUniqueInput
+    data: XOR<TwoFactorUpdateWithoutUserInput, TwoFactorUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TwoFactorUpdateManyWithWhereWithoutUserInput = {
+    where: TwoFactorScalarWhereInput
+    data: XOR<TwoFactorUpdateManyMutationInput, TwoFactorUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type TwoFactorScalarWhereInput = {
+    AND?: TwoFactorScalarWhereInput | TwoFactorScalarWhereInput[]
+    OR?: TwoFactorScalarWhereInput[]
+    NOT?: TwoFactorScalarWhereInput | TwoFactorScalarWhereInput[]
+    id?: StringFilter<"TwoFactor"> | string
+    userId?: StringFilter<"TwoFactor"> | string
+    secret?: StringFilter<"TwoFactor"> | string
+    backupCodes?: StringFilter<"TwoFactor"> | string
+    verified?: BoolFilter<"TwoFactor"> | boolean
+    failedVerificationCount?: IntFilter<"TwoFactor"> | number
+    lockedUntil?: DateTimeNullableFilter<"TwoFactor"> | Date | string | null
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     name: string
@@ -23821,9 +26740,11 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -23834,9 +26755,11 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -23863,9 +26786,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -23876,9 +26801,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -23889,9 +26816,11 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -23902,9 +26831,11 @@ export namespace Prisma {
     image?: string | null
     role?: $Enums.Role
     active?: boolean
+    twoFactorEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    twoFactors?: TwoFactorUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -23931,9 +26862,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -23944,9 +26877,87 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    twoFactors?: TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutTwoFactorsInput = {
+    id?: string
+    name: string
+    email: string
+    emailVerified?: boolean
+    image?: string | null
+    role?: $Enums.Role
+    active?: boolean
+    twoFactorEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutTwoFactorsInput = {
+    id?: string
+    name: string
+    email: string
+    emailVerified?: boolean
+    image?: string | null
+    role?: $Enums.Role
+    active?: boolean
+    twoFactorEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutTwoFactorsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTwoFactorsInput, UserUncheckedCreateWithoutTwoFactorsInput>
+  }
+
+  export type UserUpsertWithoutTwoFactorsInput = {
+    update: XOR<UserUpdateWithoutTwoFactorsInput, UserUncheckedUpdateWithoutTwoFactorsInput>
+    create: XOR<UserCreateWithoutTwoFactorsInput, UserUncheckedCreateWithoutTwoFactorsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTwoFactorsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTwoFactorsInput, UserUncheckedUpdateWithoutTwoFactorsInput>
+  }
+
+  export type UserUpdateWithoutTwoFactorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutTwoFactorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    active?: BoolFieldUpdateOperationsInput | boolean
+    twoFactorEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type credito_decisionesCreateWithoutValida1_resultsInput = {
@@ -25301,6 +28312,15 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type TwoFactorCreateManyUserInput = {
+    id?: string
+    secret: string
+    backupCodes: string
+    verified?: boolean
+    failedVerificationCount?: number
+    lockedUntil?: Date | string | null
+  }
+
   export type SessionUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
@@ -25377,6 +28397,33 @@ export namespace Prisma {
     password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TwoFactorUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TwoFactorUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TwoFactorUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    secret?: StringFieldUpdateOperationsInput | string
+    backupCodes?: StringFieldUpdateOperationsInput | string
+    verified?: BoolFieldUpdateOperationsInput | boolean
+    failedVerificationCount?: IntFieldUpdateOperationsInput | number
+    lockedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type document_resultsCreateManyValida1_resultsInput = {
