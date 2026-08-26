@@ -106,6 +106,14 @@ export const opcionesAuth = {
    * Better Auth: sin esto, un correo sin cuenta acaba viendo el JSON crudo del
    * rechazo en el navegador.
    */
+  /**
+   * Los errores del flujo social vuelven al login, no a la pagina de error de
+   * Better Auth: sin esto, un rechazo acaba mostrando el JSON crudo en el
+   * navegador.
+   *
+   * El `error` que agrega Better Auth a la query dice el motivo, y el login lo
+   * traduce (ver components/auth/login-form.tsx).
+   */
   onAPIError: {
     errorURL: "/login?social=error",
   },

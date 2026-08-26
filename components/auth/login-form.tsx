@@ -9,6 +9,7 @@ import logo from "@/public/logos/logo1.png"
 
 import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
+import { avisoDeParametros, type Aviso } from "@/lib/auth/avisos-login"
 import { signIn } from "@/lib/auth/cliente"
 import { cn } from "@/lib/utils"
 import {
@@ -28,7 +29,6 @@ const inputNormal =
 const inputError =
   "border-destructive bg-destructive/5 focus-visible:border-destructive focus-visible:ring-3 focus-visible:ring-destructive/20"
 
-type Alerta = "expired" | "closed" | "social" | null
 
 export function LoginForm({
   /** El proveedor solo se ofrece si el servidor tiene sus credenciales. */
@@ -49,17 +49,10 @@ export function LoginForm({
   const [cargando, setCargando] = React.useState(false)
   const [redirigiendo, setRedirigiendo] = React.useState(false)
 
-  const parametroSesion = searchParams.get("session")
-  // El flujo social redirige aqui con ?social=error cuando el correo no tiene
-  // cuenta (ver onAPIError en lib/auth/auth.ts).
-  const falloSocial = searchParams.get("social") === "error"
-
-  const [alerta, setAlerta] = React.useState<Alerta>(
-    falloSocial
-      ? "social"
-      : parametroSesion === "expired" || parametroSesion === "closed"
-        ? parametroSesion
-        : null
+  // El aviso sale de la URL: lo ponen el cierre de sesion, el middleware o el
+  // rechazo de un login social. La tabla de mensajes vive en avisos-login.ts.
+  const [alerta, setAlerta] = React.useState<Aviso | null>(() =>
+    avisoDeParametros(new URLSearchParams(searchParams.toString()))
   )
 
   const handleSubmit = async (evento: React.FormEvent) => {
@@ -155,24 +148,18 @@ export function LoginForm({
           </p>
         </div>
 
-        {/* Alerta de sesión */}
+        {/* Aviso: cierre de sesión, expiración o rechazo del login social. */}
         {alerta && (
           <div
             className={cn(
               "relative flex items-start gap-3 rounded-[10px] px-4 py-3",
-              alerta === "social"
+              alerta.tono === "error"
                 ? "bg-destructive/10 text-destructive"
                 : "bg-primary/10 text-primary"
             )}
           >
             <AlertCircleIcon className="mt-0.5 size-4 shrink-0" />
-            <p className="pe-6 text-sm font-medium">
-              {alerta === "social"
-                ? "Esa cuenta de Microsoft no tiene acceso. Solicítalo a un administrador."
-                : alerta === "expired"
-                  ? "Tu sesión expiró. Por favor inicia sesión nuevamente."
-                  : "Tu sesión se cerró correctamente."}
-            </p>
+            <p className="pe-6 text-sm font-medium">{alerta.mensaje}</p>
             <button
               type="button"
               onClick={() => setAlerta(null)}
