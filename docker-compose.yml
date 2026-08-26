@@ -1,6 +1,5 @@
 # Base de datos local para desarrollo y pruebas.
 #   docker compose up -d      levanta
-#   docker compose down -v    borra (incluye datos)
 services:
   db:
     image: postgres:17-alpine
