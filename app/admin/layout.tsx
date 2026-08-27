@@ -1,5 +1,6 @@
 import { VistaUsuarios } from "@/components/admin/vista-usuarios"
 import { ContenidoPrincipal } from "@/components/contenido-principal"
+import { VistaEdicionMotor } from "@/components/motores/vista-edicion-motor"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { SidebarInset } from "@/components/ui/sidebar"
@@ -22,7 +23,10 @@ export default async function Layout() {
     >
       <SidebarInset className="h-svh overflow-hidden">
         <DashboardHeader />
-        <ContenidoPrincipal vistaUsuarios={<VistaUsuarios />} />
+        <ContenidoPrincipal
+          vistaUsuarios={<VistaUsuarios />}
+          vistaEdicionMotor={<VistaEdicionMotor />}
+        />
       </SidebarInset>
     </DashboardShell>
   )

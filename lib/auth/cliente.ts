@@ -1,7 +1,10 @@
 "use client"
 
 import { createAuthClient } from "better-auth/react"
-import { twoFactorClient } from "better-auth/client/plugins"
+import {
+  lastLoginMethodClient,
+  twoFactorClient,
+} from "better-auth/client/plugins"
 
 // Cliente de Better Auth para componentes de cliente.
 export const authClient = createAuthClient({
@@ -15,7 +18,18 @@ export const authClient = createAuthClient({
        */
       twoFactorPage: "/verificar",
     }),
+    /**
+     * Lee la cookie que deja el plugin del servidor. Solo da acceso al valor:
+     * quien decide como pintarlo es /login.
+     */
+    lastLoginMethodClient(),
   ],
 })
 
-export const { signIn, signOut, useSession, twoFactor } = authClient
+export const {
+  signIn,
+  signOut,
+  useSession,
+  twoFactor,
+  getLastUsedLoginMethod,
+} = authClient

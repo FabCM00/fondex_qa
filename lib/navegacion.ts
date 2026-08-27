@@ -6,6 +6,7 @@ import type { Rol } from "@/lib/auth/roles"
 export const VISTA_ACTIVAS = "Solicitudes Activas"
 export const VISTA_GESTIONADAS = "Solicitudes Gestionadas"
 export const VISTA_USUARIOS = "Usuarios"
+export const VISTA_EDICION_MOTOR = "Edición del motor"
 export const VISTA_MI_PERFIL = "Mi perfil"
 export const VISTA_NOTIFICACIONES = "Notificaciones"
 export const VISTA_PREFERENCIAS = "Preferencias"
@@ -35,6 +36,14 @@ const MODULO_ADMINISTRACION: Modulo = {
   vistas: [{ titulo: VISTA_USUARIOS, icono: "Users" }],
 }
 
+// Configuracion del comportamiento de la app. Separado de Administracion
+// porque no gestiona personas sino como se comportan los motores.
+const MODULO_PARAMETROS: Modulo = {
+  titulo: "Parámetros",
+  icono: "SlidersHorizontal",
+  vistas: [{ titulo: VISTA_EDICION_MOTOR, icono: "SlidersHorizontal" }],
+}
+
 const MODULO_PERFIL: Modulo = {
   titulo: "Perfil",
   icono: "UserRound",
@@ -47,7 +56,7 @@ const MODULO_PERFIL: Modulo = {
 
 /** Que modulos ve cada rol. Fuente unica para el sidebar. */
 export const MODULOS_POR_ROL: Record<Rol, Modulo[]> = {
-  ADMIN: [MODULO_ADMINISTRACION, MODULO_PERFIL],
+  ADMIN: [MODULO_ADMINISTRACION, MODULO_PARAMETROS, MODULO_PERFIL],
   COLABORADOR: [MODULO_SOLICITUDES, MODULO_PERFIL],
 }
 

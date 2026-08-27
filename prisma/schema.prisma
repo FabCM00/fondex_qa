@@ -31,21 +31,21 @@ enum Role {
 /// Usuario de la aplicacion. Better Auth es el dueno de esta tabla:
 /// la contrasena vive hasheada en Account, no aqui.
 model User {
-  id String @id @default(cuid())
-  name String
-  email String @unique
-  emailVerified Boolean @default(false)
-  image String?
-  role Role @default(COLABORADOR)
-  active Boolean @default(false)
+  id               String   @id @default(cuid())
+  name             String
+  email            String   @unique
+  emailVerified    Boolean  @default(false)
+  image            String?
+  role             Role     @default(COLABORADOR)
+  active           Boolean  @default(false)
   /// Segundo factor activo. Solo aplica al login con contrasena: quien entra
   /// por Microsoft ya paso el MFA de Entra ID.
-  twoFactorEnabled Boolean @default(false)
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  twoFactorEnabled Boolean  @default(false)
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  sessions Session[]
-  accounts Account[]
+  sessions   Session[]
+  accounts   Account[]
   twoFactors TwoFactor[]
 
   @@index([email], map: "idx_user_email")
@@ -55,15 +55,15 @@ model User {
 /// Sesion activa. El token es el que viaja en la cookie httpOnly y es lo que
 /// autoriza cada accion en el sistema.
 model Session {
-  id String @id @default(cuid())
-  token String @unique
-  userId String
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
   expiresAt DateTime @db.Timestamptz(6)
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token], map: "idx_session_token")
   @@index([userId], map: "idx_session_userid")
@@ -72,22 +72,22 @@ model Session {
 
 /// Credenciales por proveedor. Para email+password guarda el hash en password.
 model Account {
-  id String @id @default(cuid())
-  accountId String
-  providerId String
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
   /// Identificador del emisor que usa Better Auth 1.7 (ej: local:credential).
-  issuer String?
-  userId String
-  accessToken String?
-  refreshToken String?
-  idToken String?
-  accessTokenExpiresAt DateTime? @db.Timestamptz(6)
+  issuer                String?
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(6)
   refreshTokenExpiresAt DateTime? @db.Timestamptz(6)
-  scope String?
-  password String?
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, accountId], map: "uq_account_provider")
   @@index([userId], map: "idx_account_userid")
@@ -96,12 +96,12 @@ model Account {
 
 /// Tokens de un solo uso: verificacion de correo y reset de contrasena.
 model Verification {
-  id String @id @default(cuid())
+  id         String   @id @default(cuid())
   identifier String
-  value String
-  expiresAt DateTime @db.Timestamptz(6)
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  value      String
+  expiresAt  DateTime @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   @@index([identifier], map: "idx_verification_identifier")
   @@map("verification")
@@ -113,13 +113,13 @@ model Verification {
 /// `failedVerificationCount` y `lockedUntil` frenan la fuerza bruta contra el
 /// codigo: seis digitos se adivinan rapido si se puede intentar sin limite.
 model TwoFactor {
-  id String @id @default(cuid())
-  userId String
-  secret String
-  backupCodes String
-  verified Boolean @default(false)
-  failedVerificationCount Int @default(0)
-  lockedUntil DateTime? @db.Timestamptz(6)
+  id                      String    @id @default(cuid())
+  userId                  String
+  secret                  String
+  backupCodes             String
+  verified                Boolean   @default(false)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime? @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -153,15 +153,15 @@ model RateLimit {
 // ---------------------------------------------------------------------------
 
 model valida1_results {
-  id BigInt @id @default(autoincrement())
-  radicado String @unique
-  cedula String?
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
-  gestionado_at DateTime? @db.Timestamptz(6)
-  gestionado_by String?
+  id              BigInt    @id @default(autoincrement())
+  radicado        String    @unique
+  cedula          String?
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+  gestionado_at   DateTime? @db.Timestamptz(6)
+  gestionado_by   String?
   /// Observacion que deja el negociador al gestionar (opcional).
   gestionado_nota String?
 
@@ -171,17 +171,17 @@ model valida1_results {
   /// un estado como `aprobado` implica desembolso: sin traza no hay forma de
   /// auditar quien lo movio. Ponerlo en NULL devuelve la solicitud al estado
   /// derivado, sin perder nada.
-  estado_manual String?
+  estado_manual    String?
   estado_manual_at DateTime? @db.Timestamptz(6)
   estado_manual_by String?
 
-  credito_decisiones credito_decisiones?
-  document_results document_results[]
-  documentos documentos[]
-  identity_validations identity_validations?
-  motor_data_results motor_data_results[]
+  credito_decisiones    credito_decisiones?
+  document_results      document_results[]
+  documentos            documentos[]
+  identity_validations  identity_validations?
+  motor_data_results    motor_data_results[]
   motor_process_results motor_process_results?
-  motor_ejecuciones motor_ejecuciones[]
+  motor_ejecuciones     motor_ejecuciones[]
 
   @@index([cedula], map: "idx_valida1_cedula")
 }
@@ -192,9 +192,9 @@ model valida1_results {
 /// garantiza que no se pueda adjuntar un documento a una solicitud que no
 /// existe.
 model documentos {
-  id BigInt @id @default(autoincrement())
+  id       BigInt @id @default(autoincrement())
   radicado String
-  cedula String
+  cedula   String
 
   // Puntero al blob. `container` se guarda explicito para soportar una futura
   // migracion de contenedor sin perder la referencia de los ya existentes.
@@ -203,13 +203,13 @@ model documentos {
 
   // Metadatos del archivo
   nombre_original String
-  mime_type String?
-  size_bytes BigInt?
+  mime_type       String?
+  size_bytes      BigInt?
   /// SHA-256 del contenido: permite detectar que se subio dos veces el mismo
   /// archivo.
-  sha256 String? @db.Char(64)
+  sha256          String? @db.Char(64)
   /// Version del blob en Azure (cambia con cada sobrescritura).
-  etag String?
+  etag            String?
 
   /// Tipo/carpeta del documento. Texto libre (p. ej. "Pagare", "Cedula").
   tipo_documento String @default("Documentos generales")
@@ -219,14 +219,14 @@ model documentos {
   estado String @default("pendiente")
 
   // Borrado logico: nunca se borra el blob ni la fila.
-  eliminado Boolean @default(false)
+  eliminado  Boolean   @default(false)
   deleted_at DateTime? @db.Timestamptz(6)
 
   subido_por String?
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
-  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_documentos_valida1")
+  valida1_results   valida1_results     @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_documentos_valida1")
   firma_solicitudes firma_solicitudes[]
 
   @@unique([container, blob_name], map: "uq_documentos_blob")
@@ -240,27 +240,27 @@ model documentos {
 /// status "pending". El webhook de ZapSign localiza la fila por
 /// `zapsign_token`.
 model firma_solicitudes {
-  id BigInt @id @default(autoincrement())
+  id           BigInt @id @default(autoincrement())
   documento_id BigInt
-  radicado String
+  radicado     String
 
   /// Token del documento en ZapSign. Es la llave que trae el webhook.
-  zapsign_token String @unique
+  zapsign_token   String  @unique
   /// open_id de ZapSign (identificador numerico visible en su panel).
   zapsign_open_id Int?
   /// URL de firma del firmante: se le reenvia si no recibio el correo.
-  sign_url String?
+  sign_url        String?
   /// Token del firmante en ZapSign (distinto del token del documento).
-  signer_token String?
+  signer_token    String?
 
   // Datos del firmante tal como se enviaron (el firmante puede editarlos en
   // ZapSign, asi que esto es lo solicitado, no necesariamente lo final).
   firmante_nombre String
-  firmante_email String?
-  firmante_phone String?
+  firmante_email  String?
+  firmante_phone  String?
 
   /// Canales por los que ZapSign notifico al firmante.
-  canal_email Boolean @default(true)
+  canal_email    Boolean @default(true)
   canal_whatsapp Boolean @default(false)
 
   /// Estado del envio: pending | signed | refused | error.
@@ -274,9 +274,9 @@ model firma_solicitudes {
   webhook_json Json?
 
   enviado_por String?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @updatedAt @db.Timestamptz(6)
-  signed_at DateTime? @db.Timestamptz(6)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @updatedAt @db.Timestamptz(6)
+  signed_at   DateTime? @db.Timestamptz(6)
 
   documento documentos @relation(fields: [documento_id], references: [id], onDelete: Cascade, map: "fk_firma_documento")
 
@@ -286,13 +286,13 @@ model firma_solicitudes {
 }
 
 model identity_validations {
-  id BigInt @id @default(autoincrement())
-  radicado String? @unique(map: "identity_validations_radicado_valida1_key")
-  cedula String?
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id              BigInt           @id @default(autoincrement())
+  radicado        String?          @unique(map: "identity_validations_radicado_valida1_key")
+  cedula          String?
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
   valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_identity_valida1")
 
   @@index([cedula], map: "idx_identity_cedula")
@@ -300,13 +300,13 @@ model identity_validations {
 }
 
 model motor_data_results {
-  id BigInt @id @default(autoincrement())
-  radicado String?
-  cedula String?
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id              BigInt           @id @default(autoincrement())
+  radicado        String?
+  cedula          String?
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
   valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_motor_data_valida1")
 
   @@index([cedula], map: "idx_motor_data_cedula")
@@ -314,13 +314,13 @@ model motor_data_results {
 }
 
 model motor_process_results {
-  id BigInt @id @default(autoincrement())
-  radicado String @unique
-  cedula String?
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String?
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
   valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onDelete: Cascade, onUpdate: NoAction, map: "fk_motor_process_valida1")
 
   @@index([cedula], map: "idx_motor_process_cedula")
@@ -350,23 +350,23 @@ model motor_ejecuciones {
 }
 
 model credito_decisiones {
-  id BigInt @id @default(autoincrement())
-  radicado String @unique
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
   valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onDelete: Cascade, onUpdate: NoAction, map: "fk_credito_valida1")
 }
 
 model document_results {
-  id BigInt @id @default(autoincrement())
-  radicado String?
-  cedula String?
-  request_json Json?
-  response_json Json?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id              BigInt           @id @default(autoincrement())
+  radicado        String?
+  cedula          String?
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
   valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_document_valida1")
 
   @@index([cedula], map: "idx_document_cedula")
@@ -374,30 +374,77 @@ model document_results {
 }
 
 model datos_asociado {
-  id BigInt @id @default(autoincrement())
-  cedula String @unique
-  primer_apellido String?
-  nombre String?
-  nombre_asociado String?
-  ciudad String?
-  cliente_empresa String?
-  estado_civil String?
-  estado_civil_norm String?
-  tipo_vivienda String?
-  nivel String?
-  usuario_credito String?
-  fecha_ingreso String?
+  id                    BigInt   @id @default(autoincrement())
+  cedula                String   @unique
+  primer_apellido       String?
+  nombre                String?
+  nombre_asociado       String?
+  ciudad                String?
+  cliente_empresa       String?
+  estado_civil          String?
+  estado_civil_norm     String?
+  tipo_vivienda         String?
+  nivel                 String?
+  usuario_credito       String?
+  fecha_ingreso         String?
   fecha_ingreso_empresa String?
-  edad Decimal? @db.Decimal
-  personas_cargo Decimal? @db.Decimal
-  antiguedad_coop Decimal? @db.Decimal
-  antiguedad_laboral Decimal? @db.Decimal
-  salario Decimal? @db.Decimal
-  aportes Decimal? @db.Decimal
-  deuda_coopvalili Decimal? @db.Decimal
-  cuota_disponible Decimal? @db.Decimal
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  edad                  Decimal? @db.Decimal
+  personas_cargo        Decimal? @db.Decimal
+  antiguedad_coop       Decimal? @db.Decimal
+  antiguedad_laboral    Decimal? @db.Decimal
+  salario               Decimal? @db.Decimal
+  aportes               Decimal? @db.Decimal
+  deuda_coopvalili      Decimal? @db.Decimal
+  cuota_disponible      Decimal? @db.Decimal
+  created_at            DateTime @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([cedula], map: "idx_datos_asociado_cedula")
+}
+
+// ---------------------------------------------------------------------------
+// CONFIGURACION DE EDICION DEL MOTOR
+//
+// Define, por motor y por campo, que se puede editar antes de volver a
+// ejecutar. Los campos se identifican con un path dentro del request_json
+// (`solicitante.salario`), no con columnas: asi la misma tabla sirve para
+// cualquier motor que se agregue despues sin tocar codigo.
+// ---------------------------------------------------------------------------
+
+enum TipoCampoMotor {
+  TEXTO
+  NUMERO
+  BOOLEANO
+}
+
+model edicionMotor {
+  id BigInt @id @default(autoincrement())
+
+  /// Que motor configura esta fila. Coincide con el paso que se reejecuta.
+  motor String
+
+  /// Ruta del campo dentro del request_json, con puntos para bajar de nivel.
+  campo String
+
+  /// Como se le presenta al usuario en el PopUp.
+  etiqueta String
+
+  /// Decide que control pinta el PopUp y como se castea al guardar.
+  tipo TipoCampoMotor @default(TEXTO)
+
+  /// En false el campo se lista pero llega bloqueado.
+  editable Boolean @default(true)
+
+  /// Texto de ayuda bajo el control.
+  ayuda String?
+
+  /// Orden de aparicion en el PopUp.
+  orden Int @default(0)
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  @@unique([motor, campo], map: "uq_edicion_motor_campo")
+  @@index([motor, orden], map: "idx_edicion_motor_orden")
+  @@map("edicion_motor")
 }

@@ -117,6 +117,11 @@ export type document_results = $Result.DefaultSelection<Prisma.$document_results
  * 
  */
 export type datos_asociado = $Result.DefaultSelection<Prisma.$datos_asociadoPayload>
+/**
+ * Model edicionMotor
+ * 
+ */
+export type edicionMotor = $Result.DefaultSelection<Prisma.$edicionMotorPayload>
 
 /**
  * Enums
@@ -129,11 +134,24 @@ export namespace $Enums {
 
 export type Role = (typeof Role)[keyof typeof Role]
 
+
+export const TipoCampoMotor: {
+  TEXTO: 'TEXTO',
+  NUMERO: 'NUMERO',
+  BOOLEANO: 'BOOLEANO'
+};
+
+export type TipoCampoMotor = (typeof TipoCampoMotor)[keyof typeof TipoCampoMotor]
+
 }
 
 export type Role = $Enums.Role
 
 export const Role: typeof $Enums.Role
+
+export type TipoCampoMotor = $Enums.TipoCampoMotor
+
+export const TipoCampoMotor: typeof $Enums.TipoCampoMotor
 
 /**
  * ##  Prisma Client ʲˢ
@@ -415,6 +433,16 @@ export class PrismaClient<
     * ```
     */
   get datos_asociado(): Prisma.datos_asociadoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.edicionMotor`: Exposes CRUD operations for the **edicionMotor** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EdicionMotors
+    * const edicionMotors = await prisma.edicionMotor.findMany()
+    * ```
+    */
+  get edicionMotor(): Prisma.edicionMotorDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -877,7 +905,8 @@ export namespace Prisma {
     motor_ejecuciones: 'motor_ejecuciones',
     credito_decisiones: 'credito_decisiones',
     document_results: 'document_results',
-    datos_asociado: 'datos_asociado'
+    datos_asociado: 'datos_asociado',
+    edicionMotor: 'edicionMotor'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -893,7 +922,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "session" | "account" | "verification" | "twoFactor" | "rateLimit" | "valida1_results" | "documentos" | "firma_solicitudes" | "identity_validations" | "motor_data_results" | "motor_process_results" | "motor_ejecuciones" | "credito_decisiones" | "document_results" | "datos_asociado"
+      modelProps: "user" | "session" | "account" | "verification" | "twoFactor" | "rateLimit" | "valida1_results" | "documentos" | "firma_solicitudes" | "identity_validations" | "motor_data_results" | "motor_process_results" | "motor_ejecuciones" | "credito_decisiones" | "document_results" | "datos_asociado" | "edicionMotor"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2081,6 +2110,80 @@ export namespace Prisma {
           }
         }
       }
+      edicionMotor: {
+        payload: Prisma.$edicionMotorPayload<ExtArgs>
+        fields: Prisma.edicionMotorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.edicionMotorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.edicionMotorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          findFirst: {
+            args: Prisma.edicionMotorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.edicionMotorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          findMany: {
+            args: Prisma.edicionMotorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>[]
+          }
+          create: {
+            args: Prisma.edicionMotorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          createMany: {
+            args: Prisma.edicionMotorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.edicionMotorCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>[]
+          }
+          delete: {
+            args: Prisma.edicionMotorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          update: {
+            args: Prisma.edicionMotorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          deleteMany: {
+            args: Prisma.edicionMotorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.edicionMotorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.edicionMotorUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>[]
+          }
+          upsert: {
+            args: Prisma.edicionMotorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$edicionMotorPayload>
+          }
+          aggregate: {
+            args: Prisma.EdicionMotorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEdicionMotor>
+          }
+          groupBy: {
+            args: Prisma.edicionMotorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EdicionMotorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.edicionMotorCountArgs<ExtArgs>
+            result: $Utils.Optional<EdicionMotorCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2220,6 +2323,7 @@ export namespace Prisma {
     credito_decisiones?: credito_decisionesOmit
     document_results?: document_resultsOmit
     datos_asociado?: datos_asociadoOmit
+    edicionMotor?: edicionMotorOmit
   }
 
   /* Types for Logging */
@@ -21103,6 +21207,1130 @@ export namespace Prisma {
 
 
   /**
+   * Model edicionMotor
+   */
+
+  export type AggregateEdicionMotor = {
+    _count: EdicionMotorCountAggregateOutputType | null
+    _avg: EdicionMotorAvgAggregateOutputType | null
+    _sum: EdicionMotorSumAggregateOutputType | null
+    _min: EdicionMotorMinAggregateOutputType | null
+    _max: EdicionMotorMaxAggregateOutputType | null
+  }
+
+  export type EdicionMotorAvgAggregateOutputType = {
+    id: number | null
+    orden: number | null
+  }
+
+  export type EdicionMotorSumAggregateOutputType = {
+    id: bigint | null
+    orden: number | null
+  }
+
+  export type EdicionMotorMinAggregateOutputType = {
+    id: bigint | null
+    motor: string | null
+    campo: string | null
+    etiqueta: string | null
+    tipo: $Enums.TipoCampoMotor | null
+    editable: boolean | null
+    ayuda: string | null
+    orden: number | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type EdicionMotorMaxAggregateOutputType = {
+    id: bigint | null
+    motor: string | null
+    campo: string | null
+    etiqueta: string | null
+    tipo: $Enums.TipoCampoMotor | null
+    editable: boolean | null
+    ayuda: string | null
+    orden: number | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type EdicionMotorCountAggregateOutputType = {
+    id: number
+    motor: number
+    campo: number
+    etiqueta: number
+    tipo: number
+    editable: number
+    ayuda: number
+    orden: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type EdicionMotorAvgAggregateInputType = {
+    id?: true
+    orden?: true
+  }
+
+  export type EdicionMotorSumAggregateInputType = {
+    id?: true
+    orden?: true
+  }
+
+  export type EdicionMotorMinAggregateInputType = {
+    id?: true
+    motor?: true
+    campo?: true
+    etiqueta?: true
+    tipo?: true
+    editable?: true
+    ayuda?: true
+    orden?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type EdicionMotorMaxAggregateInputType = {
+    id?: true
+    motor?: true
+    campo?: true
+    etiqueta?: true
+    tipo?: true
+    editable?: true
+    ayuda?: true
+    orden?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type EdicionMotorCountAggregateInputType = {
+    id?: true
+    motor?: true
+    campo?: true
+    etiqueta?: true
+    tipo?: true
+    editable?: true
+    ayuda?: true
+    orden?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type EdicionMotorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which edicionMotor to aggregate.
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of edicionMotors to fetch.
+     */
+    orderBy?: edicionMotorOrderByWithRelationInput | edicionMotorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: edicionMotorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` edicionMotors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` edicionMotors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned edicionMotors
+    **/
+    _count?: true | EdicionMotorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EdicionMotorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EdicionMotorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EdicionMotorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EdicionMotorMaxAggregateInputType
+  }
+
+  export type GetEdicionMotorAggregateType<T extends EdicionMotorAggregateArgs> = {
+        [P in keyof T & keyof AggregateEdicionMotor]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEdicionMotor[P]>
+      : GetScalarType<T[P], AggregateEdicionMotor[P]>
+  }
+
+
+
+
+  export type edicionMotorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: edicionMotorWhereInput
+    orderBy?: edicionMotorOrderByWithAggregationInput | edicionMotorOrderByWithAggregationInput[]
+    by: EdicionMotorScalarFieldEnum[] | EdicionMotorScalarFieldEnum
+    having?: edicionMotorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EdicionMotorCountAggregateInputType | true
+    _avg?: EdicionMotorAvgAggregateInputType
+    _sum?: EdicionMotorSumAggregateInputType
+    _min?: EdicionMotorMinAggregateInputType
+    _max?: EdicionMotorMaxAggregateInputType
+  }
+
+  export type EdicionMotorGroupByOutputType = {
+    id: bigint
+    motor: string
+    campo: string
+    etiqueta: string
+    tipo: $Enums.TipoCampoMotor
+    editable: boolean
+    ayuda: string | null
+    orden: number
+    created_at: Date
+    updated_at: Date
+    _count: EdicionMotorCountAggregateOutputType | null
+    _avg: EdicionMotorAvgAggregateOutputType | null
+    _sum: EdicionMotorSumAggregateOutputType | null
+    _min: EdicionMotorMinAggregateOutputType | null
+    _max: EdicionMotorMaxAggregateOutputType | null
+  }
+
+  type GetEdicionMotorGroupByPayload<T extends edicionMotorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EdicionMotorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EdicionMotorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EdicionMotorGroupByOutputType[P]>
+            : GetScalarType<T[P], EdicionMotorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type edicionMotorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    motor?: boolean
+    campo?: boolean
+    etiqueta?: boolean
+    tipo?: boolean
+    editable?: boolean
+    ayuda?: boolean
+    orden?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["edicionMotor"]>
+
+  export type edicionMotorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    motor?: boolean
+    campo?: boolean
+    etiqueta?: boolean
+    tipo?: boolean
+    editable?: boolean
+    ayuda?: boolean
+    orden?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["edicionMotor"]>
+
+  export type edicionMotorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    motor?: boolean
+    campo?: boolean
+    etiqueta?: boolean
+    tipo?: boolean
+    editable?: boolean
+    ayuda?: boolean
+    orden?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["edicionMotor"]>
+
+  export type edicionMotorSelectScalar = {
+    id?: boolean
+    motor?: boolean
+    campo?: boolean
+    etiqueta?: boolean
+    tipo?: boolean
+    editable?: boolean
+    ayuda?: boolean
+    orden?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type edicionMotorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "motor" | "campo" | "etiqueta" | "tipo" | "editable" | "ayuda" | "orden" | "created_at" | "updated_at", ExtArgs["result"]["edicionMotor"]>
+
+  export type $edicionMotorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "edicionMotor"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: bigint
+      /**
+       * Que motor configura esta fila. Coincide con el paso que se reejecuta.
+       */
+      motor: string
+      /**
+       * Ruta del campo dentro del request_json, con puntos para bajar de nivel.
+       */
+      campo: string
+      /**
+       * Como se le presenta al usuario en el PopUp.
+       */
+      etiqueta: string
+      /**
+       * Decide que control pinta el PopUp y como se castea al guardar.
+       */
+      tipo: $Enums.TipoCampoMotor
+      /**
+       * En false el campo se lista pero llega bloqueado.
+       */
+      editable: boolean
+      /**
+       * Texto de ayuda bajo el control.
+       */
+      ayuda: string | null
+      /**
+       * Orden de aparicion en el PopUp.
+       */
+      orden: number
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["edicionMotor"]>
+    composites: {}
+  }
+
+  type edicionMotorGetPayload<S extends boolean | null | undefined | edicionMotorDefaultArgs> = $Result.GetResult<Prisma.$edicionMotorPayload, S>
+
+  type edicionMotorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<edicionMotorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EdicionMotorCountAggregateInputType | true
+    }
+
+  export interface edicionMotorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['edicionMotor'], meta: { name: 'edicionMotor' } }
+    /**
+     * Find zero or one EdicionMotor that matches the filter.
+     * @param {edicionMotorFindUniqueArgs} args - Arguments to find a EdicionMotor
+     * @example
+     * // Get one EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends edicionMotorFindUniqueArgs>(args: SelectSubset<T, edicionMotorFindUniqueArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EdicionMotor that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {edicionMotorFindUniqueOrThrowArgs} args - Arguments to find a EdicionMotor
+     * @example
+     * // Get one EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends edicionMotorFindUniqueOrThrowArgs>(args: SelectSubset<T, edicionMotorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EdicionMotor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorFindFirstArgs} args - Arguments to find a EdicionMotor
+     * @example
+     * // Get one EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends edicionMotorFindFirstArgs>(args?: SelectSubset<T, edicionMotorFindFirstArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EdicionMotor that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorFindFirstOrThrowArgs} args - Arguments to find a EdicionMotor
+     * @example
+     * // Get one EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends edicionMotorFindFirstOrThrowArgs>(args?: SelectSubset<T, edicionMotorFindFirstOrThrowArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EdicionMotors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EdicionMotors
+     * const edicionMotors = await prisma.edicionMotor.findMany()
+     * 
+     * // Get first 10 EdicionMotors
+     * const edicionMotors = await prisma.edicionMotor.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const edicionMotorWithIdOnly = await prisma.edicionMotor.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends edicionMotorFindManyArgs>(args?: SelectSubset<T, edicionMotorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EdicionMotor.
+     * @param {edicionMotorCreateArgs} args - Arguments to create a EdicionMotor.
+     * @example
+     * // Create one EdicionMotor
+     * const EdicionMotor = await prisma.edicionMotor.create({
+     *   data: {
+     *     // ... data to create a EdicionMotor
+     *   }
+     * })
+     * 
+     */
+    create<T extends edicionMotorCreateArgs>(args: SelectSubset<T, edicionMotorCreateArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EdicionMotors.
+     * @param {edicionMotorCreateManyArgs} args - Arguments to create many EdicionMotors.
+     * @example
+     * // Create many EdicionMotors
+     * const edicionMotor = await prisma.edicionMotor.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends edicionMotorCreateManyArgs>(args?: SelectSubset<T, edicionMotorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EdicionMotors and returns the data saved in the database.
+     * @param {edicionMotorCreateManyAndReturnArgs} args - Arguments to create many EdicionMotors.
+     * @example
+     * // Create many EdicionMotors
+     * const edicionMotor = await prisma.edicionMotor.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EdicionMotors and only return the `id`
+     * const edicionMotorWithIdOnly = await prisma.edicionMotor.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends edicionMotorCreateManyAndReturnArgs>(args?: SelectSubset<T, edicionMotorCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EdicionMotor.
+     * @param {edicionMotorDeleteArgs} args - Arguments to delete one EdicionMotor.
+     * @example
+     * // Delete one EdicionMotor
+     * const EdicionMotor = await prisma.edicionMotor.delete({
+     *   where: {
+     *     // ... filter to delete one EdicionMotor
+     *   }
+     * })
+     * 
+     */
+    delete<T extends edicionMotorDeleteArgs>(args: SelectSubset<T, edicionMotorDeleteArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EdicionMotor.
+     * @param {edicionMotorUpdateArgs} args - Arguments to update one EdicionMotor.
+     * @example
+     * // Update one EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends edicionMotorUpdateArgs>(args: SelectSubset<T, edicionMotorUpdateArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EdicionMotors.
+     * @param {edicionMotorDeleteManyArgs} args - Arguments to filter EdicionMotors to delete.
+     * @example
+     * // Delete a few EdicionMotors
+     * const { count } = await prisma.edicionMotor.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends edicionMotorDeleteManyArgs>(args?: SelectSubset<T, edicionMotorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EdicionMotors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EdicionMotors
+     * const edicionMotor = await prisma.edicionMotor.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends edicionMotorUpdateManyArgs>(args: SelectSubset<T, edicionMotorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EdicionMotors and returns the data updated in the database.
+     * @param {edicionMotorUpdateManyAndReturnArgs} args - Arguments to update many EdicionMotors.
+     * @example
+     * // Update many EdicionMotors
+     * const edicionMotor = await prisma.edicionMotor.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EdicionMotors and only return the `id`
+     * const edicionMotorWithIdOnly = await prisma.edicionMotor.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends edicionMotorUpdateManyAndReturnArgs>(args: SelectSubset<T, edicionMotorUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EdicionMotor.
+     * @param {edicionMotorUpsertArgs} args - Arguments to update or create a EdicionMotor.
+     * @example
+     * // Update or create a EdicionMotor
+     * const edicionMotor = await prisma.edicionMotor.upsert({
+     *   create: {
+     *     // ... data to create a EdicionMotor
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EdicionMotor we want to update
+     *   }
+     * })
+     */
+    upsert<T extends edicionMotorUpsertArgs>(args: SelectSubset<T, edicionMotorUpsertArgs<ExtArgs>>): Prisma__edicionMotorClient<$Result.GetResult<Prisma.$edicionMotorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EdicionMotors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorCountArgs} args - Arguments to filter EdicionMotors to count.
+     * @example
+     * // Count the number of EdicionMotors
+     * const count = await prisma.edicionMotor.count({
+     *   where: {
+     *     // ... the filter for the EdicionMotors we want to count
+     *   }
+     * })
+    **/
+    count<T extends edicionMotorCountArgs>(
+      args?: Subset<T, edicionMotorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EdicionMotorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EdicionMotor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EdicionMotorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EdicionMotorAggregateArgs>(args: Subset<T, EdicionMotorAggregateArgs>): Prisma.PrismaPromise<GetEdicionMotorAggregateType<T>>
+
+    /**
+     * Group by EdicionMotor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {edicionMotorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends edicionMotorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: edicionMotorGroupByArgs['orderBy'] }
+        : { orderBy?: edicionMotorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, edicionMotorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEdicionMotorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the edicionMotor model
+   */
+  readonly fields: edicionMotorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for edicionMotor.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__edicionMotorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the edicionMotor model
+   */
+  interface edicionMotorFieldRefs {
+    readonly id: FieldRef<"edicionMotor", 'BigInt'>
+    readonly motor: FieldRef<"edicionMotor", 'String'>
+    readonly campo: FieldRef<"edicionMotor", 'String'>
+    readonly etiqueta: FieldRef<"edicionMotor", 'String'>
+    readonly tipo: FieldRef<"edicionMotor", 'TipoCampoMotor'>
+    readonly editable: FieldRef<"edicionMotor", 'Boolean'>
+    readonly ayuda: FieldRef<"edicionMotor", 'String'>
+    readonly orden: FieldRef<"edicionMotor", 'Int'>
+    readonly created_at: FieldRef<"edicionMotor", 'DateTime'>
+    readonly updated_at: FieldRef<"edicionMotor", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * edicionMotor findUnique
+   */
+  export type edicionMotorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter, which edicionMotor to fetch.
+     */
+    where: edicionMotorWhereUniqueInput
+  }
+
+  /**
+   * edicionMotor findUniqueOrThrow
+   */
+  export type edicionMotorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter, which edicionMotor to fetch.
+     */
+    where: edicionMotorWhereUniqueInput
+  }
+
+  /**
+   * edicionMotor findFirst
+   */
+  export type edicionMotorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter, which edicionMotor to fetch.
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of edicionMotors to fetch.
+     */
+    orderBy?: edicionMotorOrderByWithRelationInput | edicionMotorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for edicionMotors.
+     */
+    cursor?: edicionMotorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` edicionMotors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` edicionMotors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of edicionMotors.
+     */
+    distinct?: EdicionMotorScalarFieldEnum | EdicionMotorScalarFieldEnum[]
+  }
+
+  /**
+   * edicionMotor findFirstOrThrow
+   */
+  export type edicionMotorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter, which edicionMotor to fetch.
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of edicionMotors to fetch.
+     */
+    orderBy?: edicionMotorOrderByWithRelationInput | edicionMotorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for edicionMotors.
+     */
+    cursor?: edicionMotorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` edicionMotors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` edicionMotors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of edicionMotors.
+     */
+    distinct?: EdicionMotorScalarFieldEnum | EdicionMotorScalarFieldEnum[]
+  }
+
+  /**
+   * edicionMotor findMany
+   */
+  export type edicionMotorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter, which edicionMotors to fetch.
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of edicionMotors to fetch.
+     */
+    orderBy?: edicionMotorOrderByWithRelationInput | edicionMotorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing edicionMotors.
+     */
+    cursor?: edicionMotorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` edicionMotors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` edicionMotors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of edicionMotors.
+     */
+    distinct?: EdicionMotorScalarFieldEnum | EdicionMotorScalarFieldEnum[]
+  }
+
+  /**
+   * edicionMotor create
+   */
+  export type edicionMotorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * The data needed to create a edicionMotor.
+     */
+    data: XOR<edicionMotorCreateInput, edicionMotorUncheckedCreateInput>
+  }
+
+  /**
+   * edicionMotor createMany
+   */
+  export type edicionMotorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many edicionMotors.
+     */
+    data: edicionMotorCreateManyInput | edicionMotorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * edicionMotor createManyAndReturn
+   */
+  export type edicionMotorCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * The data used to create many edicionMotors.
+     */
+    data: edicionMotorCreateManyInput | edicionMotorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * edicionMotor update
+   */
+  export type edicionMotorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * The data needed to update a edicionMotor.
+     */
+    data: XOR<edicionMotorUpdateInput, edicionMotorUncheckedUpdateInput>
+    /**
+     * Choose, which edicionMotor to update.
+     */
+    where: edicionMotorWhereUniqueInput
+  }
+
+  /**
+   * edicionMotor updateMany
+   */
+  export type edicionMotorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update edicionMotors.
+     */
+    data: XOR<edicionMotorUpdateManyMutationInput, edicionMotorUncheckedUpdateManyInput>
+    /**
+     * Filter which edicionMotors to update
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * Limit how many edicionMotors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * edicionMotor updateManyAndReturn
+   */
+  export type edicionMotorUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * The data used to update edicionMotors.
+     */
+    data: XOR<edicionMotorUpdateManyMutationInput, edicionMotorUncheckedUpdateManyInput>
+    /**
+     * Filter which edicionMotors to update
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * Limit how many edicionMotors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * edicionMotor upsert
+   */
+  export type edicionMotorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * The filter to search for the edicionMotor to update in case it exists.
+     */
+    where: edicionMotorWhereUniqueInput
+    /**
+     * In case the edicionMotor found by the `where` argument doesn't exist, create a new edicionMotor with this data.
+     */
+    create: XOR<edicionMotorCreateInput, edicionMotorUncheckedCreateInput>
+    /**
+     * In case the edicionMotor was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<edicionMotorUpdateInput, edicionMotorUncheckedUpdateInput>
+  }
+
+  /**
+   * edicionMotor delete
+   */
+  export type edicionMotorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+    /**
+     * Filter which edicionMotor to delete.
+     */
+    where: edicionMotorWhereUniqueInput
+  }
+
+  /**
+   * edicionMotor deleteMany
+   */
+  export type edicionMotorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which edicionMotors to delete
+     */
+    where?: edicionMotorWhereInput
+    /**
+     * Limit how many edicionMotors to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * edicionMotor without action
+   */
+  export type edicionMotorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the edicionMotor
+     */
+    select?: edicionMotorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the edicionMotor
+     */
+    omit?: edicionMotorOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -21374,6 +22602,22 @@ export namespace Prisma {
   export type Datos_asociadoScalarFieldEnum = (typeof Datos_asociadoScalarFieldEnum)[keyof typeof Datos_asociadoScalarFieldEnum]
 
 
+  export const EdicionMotorScalarFieldEnum: {
+    id: 'id',
+    motor: 'motor',
+    campo: 'campo',
+    etiqueta: 'etiqueta',
+    tipo: 'tipo',
+    editable: 'editable',
+    ayuda: 'ayuda',
+    orden: 'orden',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type EdicionMotorScalarFieldEnum = (typeof EdicionMotorScalarFieldEnum)[keyof typeof EdicionMotorScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -21522,6 +22766,20 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal[]'
    */
   export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'TipoCampoMotor'
+   */
+  export type EnumTipoCampoMotorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoCampoMotor'>
+    
+
+
+  /**
+   * Reference to a field of type 'TipoCampoMotor[]'
+   */
+  export type ListEnumTipoCampoMotorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoCampoMotor[]'>
     
 
 
@@ -22874,6 +24132,86 @@ export namespace Prisma {
     cuota_disponible?: DecimalNullableWithAggregatesFilter<"datos_asociado"> | Decimal | DecimalJsLike | number | string | null
     created_at?: DateTimeWithAggregatesFilter<"datos_asociado"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"datos_asociado"> | Date | string
+  }
+
+  export type edicionMotorWhereInput = {
+    AND?: edicionMotorWhereInput | edicionMotorWhereInput[]
+    OR?: edicionMotorWhereInput[]
+    NOT?: edicionMotorWhereInput | edicionMotorWhereInput[]
+    id?: BigIntFilter<"edicionMotor"> | bigint | number
+    motor?: StringFilter<"edicionMotor"> | string
+    campo?: StringFilter<"edicionMotor"> | string
+    etiqueta?: StringFilter<"edicionMotor"> | string
+    tipo?: EnumTipoCampoMotorFilter<"edicionMotor"> | $Enums.TipoCampoMotor
+    editable?: BoolFilter<"edicionMotor"> | boolean
+    ayuda?: StringNullableFilter<"edicionMotor"> | string | null
+    orden?: IntFilter<"edicionMotor"> | number
+    created_at?: DateTimeFilter<"edicionMotor"> | Date | string
+    updated_at?: DateTimeFilter<"edicionMotor"> | Date | string
+  }
+
+  export type edicionMotorOrderByWithRelationInput = {
+    id?: SortOrder
+    motor?: SortOrder
+    campo?: SortOrder
+    etiqueta?: SortOrder
+    tipo?: SortOrder
+    editable?: SortOrder
+    ayuda?: SortOrderInput | SortOrder
+    orden?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type edicionMotorWhereUniqueInput = Prisma.AtLeast<{
+    id?: bigint | number
+    motor_campo?: edicionMotorMotorCampoCompoundUniqueInput
+    AND?: edicionMotorWhereInput | edicionMotorWhereInput[]
+    OR?: edicionMotorWhereInput[]
+    NOT?: edicionMotorWhereInput | edicionMotorWhereInput[]
+    motor?: StringFilter<"edicionMotor"> | string
+    campo?: StringFilter<"edicionMotor"> | string
+    etiqueta?: StringFilter<"edicionMotor"> | string
+    tipo?: EnumTipoCampoMotorFilter<"edicionMotor"> | $Enums.TipoCampoMotor
+    editable?: BoolFilter<"edicionMotor"> | boolean
+    ayuda?: StringNullableFilter<"edicionMotor"> | string | null
+    orden?: IntFilter<"edicionMotor"> | number
+    created_at?: DateTimeFilter<"edicionMotor"> | Date | string
+    updated_at?: DateTimeFilter<"edicionMotor"> | Date | string
+  }, "id" | "motor_campo">
+
+  export type edicionMotorOrderByWithAggregationInput = {
+    id?: SortOrder
+    motor?: SortOrder
+    campo?: SortOrder
+    etiqueta?: SortOrder
+    tipo?: SortOrder
+    editable?: SortOrder
+    ayuda?: SortOrderInput | SortOrder
+    orden?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: edicionMotorCountOrderByAggregateInput
+    _avg?: edicionMotorAvgOrderByAggregateInput
+    _max?: edicionMotorMaxOrderByAggregateInput
+    _min?: edicionMotorMinOrderByAggregateInput
+    _sum?: edicionMotorSumOrderByAggregateInput
+  }
+
+  export type edicionMotorScalarWhereWithAggregatesInput = {
+    AND?: edicionMotorScalarWhereWithAggregatesInput | edicionMotorScalarWhereWithAggregatesInput[]
+    OR?: edicionMotorScalarWhereWithAggregatesInput[]
+    NOT?: edicionMotorScalarWhereWithAggregatesInput | edicionMotorScalarWhereWithAggregatesInput[]
+    id?: BigIntWithAggregatesFilter<"edicionMotor"> | bigint | number
+    motor?: StringWithAggregatesFilter<"edicionMotor"> | string
+    campo?: StringWithAggregatesFilter<"edicionMotor"> | string
+    etiqueta?: StringWithAggregatesFilter<"edicionMotor"> | string
+    tipo?: EnumTipoCampoMotorWithAggregatesFilter<"edicionMotor"> | $Enums.TipoCampoMotor
+    editable?: BoolWithAggregatesFilter<"edicionMotor"> | boolean
+    ayuda?: StringNullableWithAggregatesFilter<"edicionMotor"> | string | null
+    orden?: IntWithAggregatesFilter<"edicionMotor"> | number
+    created_at?: DateTimeWithAggregatesFilter<"edicionMotor"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"edicionMotor"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -24379,6 +25717,97 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type edicionMotorCreateInput = {
+    id?: bigint | number
+    motor: string
+    campo: string
+    etiqueta: string
+    tipo?: $Enums.TipoCampoMotor
+    editable?: boolean
+    ayuda?: string | null
+    orden?: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type edicionMotorUncheckedCreateInput = {
+    id?: bigint | number
+    motor: string
+    campo: string
+    etiqueta: string
+    tipo?: $Enums.TipoCampoMotor
+    editable?: boolean
+    ayuda?: string | null
+    orden?: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type edicionMotorUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    motor?: StringFieldUpdateOperationsInput | string
+    campo?: StringFieldUpdateOperationsInput | string
+    etiqueta?: StringFieldUpdateOperationsInput | string
+    tipo?: EnumTipoCampoMotorFieldUpdateOperationsInput | $Enums.TipoCampoMotor
+    editable?: BoolFieldUpdateOperationsInput | boolean
+    ayuda?: NullableStringFieldUpdateOperationsInput | string | null
+    orden?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type edicionMotorUncheckedUpdateInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    motor?: StringFieldUpdateOperationsInput | string
+    campo?: StringFieldUpdateOperationsInput | string
+    etiqueta?: StringFieldUpdateOperationsInput | string
+    tipo?: EnumTipoCampoMotorFieldUpdateOperationsInput | $Enums.TipoCampoMotor
+    editable?: BoolFieldUpdateOperationsInput | boolean
+    ayuda?: NullableStringFieldUpdateOperationsInput | string | null
+    orden?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type edicionMotorCreateManyInput = {
+    id?: bigint | number
+    motor: string
+    campo: string
+    etiqueta: string
+    tipo?: $Enums.TipoCampoMotor
+    editable?: boolean
+    ayuda?: string | null
+    orden?: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type edicionMotorUpdateManyMutationInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    motor?: StringFieldUpdateOperationsInput | string
+    campo?: StringFieldUpdateOperationsInput | string
+    etiqueta?: StringFieldUpdateOperationsInput | string
+    tipo?: EnumTipoCampoMotorFieldUpdateOperationsInput | $Enums.TipoCampoMotor
+    editable?: BoolFieldUpdateOperationsInput | boolean
+    ayuda?: NullableStringFieldUpdateOperationsInput | string | null
+    orden?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type edicionMotorUncheckedUpdateManyInput = {
+    id?: BigIntFieldUpdateOperationsInput | bigint | number
+    motor?: StringFieldUpdateOperationsInput | string
+    campo?: StringFieldUpdateOperationsInput | string
+    etiqueta?: StringFieldUpdateOperationsInput | string
+    tipo?: EnumTipoCampoMotorFieldUpdateOperationsInput | $Enums.TipoCampoMotor
+    editable?: BoolFieldUpdateOperationsInput | boolean
+    ayuda?: NullableStringFieldUpdateOperationsInput | string | null
+    orden?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -25559,6 +26988,77 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type EnumTipoCampoMotorFilter<$PrismaModel = never> = {
+    equals?: $Enums.TipoCampoMotor | EnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    in?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    not?: NestedEnumTipoCampoMotorFilter<$PrismaModel> | $Enums.TipoCampoMotor
+  }
+
+  export type edicionMotorMotorCampoCompoundUniqueInput = {
+    motor: string
+    campo: string
+  }
+
+  export type edicionMotorCountOrderByAggregateInput = {
+    id?: SortOrder
+    motor?: SortOrder
+    campo?: SortOrder
+    etiqueta?: SortOrder
+    tipo?: SortOrder
+    editable?: SortOrder
+    ayuda?: SortOrder
+    orden?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type edicionMotorAvgOrderByAggregateInput = {
+    id?: SortOrder
+    orden?: SortOrder
+  }
+
+  export type edicionMotorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    motor?: SortOrder
+    campo?: SortOrder
+    etiqueta?: SortOrder
+    tipo?: SortOrder
+    editable?: SortOrder
+    ayuda?: SortOrder
+    orden?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type edicionMotorMinOrderByAggregateInput = {
+    id?: SortOrder
+    motor?: SortOrder
+    campo?: SortOrder
+    etiqueta?: SortOrder
+    tipo?: SortOrder
+    editable?: SortOrder
+    ayuda?: SortOrder
+    orden?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type edicionMotorSumOrderByAggregateInput = {
+    id?: SortOrder
+    orden?: SortOrder
+  }
+
+  export type EnumTipoCampoMotorWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TipoCampoMotor | EnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    in?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    not?: NestedEnumTipoCampoMotorWithAggregatesFilter<$PrismaModel> | $Enums.TipoCampoMotor
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTipoCampoMotorFilter<$PrismaModel>
+    _max?: NestedEnumTipoCampoMotorFilter<$PrismaModel>
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -26215,6 +27715,10 @@ export namespace Prisma {
     divide?: Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumTipoCampoMotorFieldUpdateOperationsInput = {
+    set?: $Enums.TipoCampoMotor
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -26535,6 +28039,23 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTipoCampoMotorFilter<$PrismaModel = never> = {
+    equals?: $Enums.TipoCampoMotor | EnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    in?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    not?: NestedEnumTipoCampoMotorFilter<$PrismaModel> | $Enums.TipoCampoMotor
+  }
+
+  export type NestedEnumTipoCampoMotorWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TipoCampoMotor | EnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    in?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TipoCampoMotor[] | ListEnumTipoCampoMotorFieldRefInput<$PrismaModel>
+    not?: NestedEnumTipoCampoMotorWithAggregatesFilter<$PrismaModel> | $Enums.TipoCampoMotor
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTipoCampoMotorFilter<$PrismaModel>
+    _max?: NestedEnumTipoCampoMotorFilter<$PrismaModel>
   }
 
   export type SessionCreateWithoutUserInput = {

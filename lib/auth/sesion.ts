@@ -54,3 +54,14 @@ export async function exigirRol(rol: Rol): Promise<UsuarioSesion> {
   if (usuario.rol !== rol) redirect("/sin-permisos")
   return usuario
 }
+
+/**
+ * Solo exige que haya sesion, sin importar el rol ni la ruta. Para acciones
+ * de vistas compartidas por todos los roles (Mi perfil, notificaciones,
+ * preferencias), donde no aplica ninguna regla de REGLAS en roles.ts.
+ */
+export async function exigirUsuario(): Promise<UsuarioSesion> {
+  const usuario = await obtenerSesion()
+  if (!usuario) redirect("/login?session=expired")
+  return usuario
+}

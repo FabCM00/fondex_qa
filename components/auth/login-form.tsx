@@ -10,7 +10,7 @@ import logo from "@/public/logos/logo1.png"
 import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
 import { avisoDeParametros, type Aviso } from "@/lib/auth/avisos-login"
-import { signIn } from "@/lib/auth/cliente"
+import { getLastUsedLoginMethod, signIn } from "@/lib/auth/cliente"
 import { cn } from "@/lib/utils"
 import {
   AlertCircleIcon,
@@ -28,6 +28,37 @@ const inputNormal =
   "border-input focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
 const inputError =
   "border-destructive bg-destructive/5 focus-visible:border-destructive focus-visible:ring-3 focus-visible:ring-destructive/20"
+
+/**
+ * La cookie del ultimo metodo es una fuente externa a React y no cambia sola
+ * mientras la pantalla esta abierta, asi que no hay a que suscribirse.
+ */
+const sinCambios = () => () => {}
+
+/**
+ * Con que entro el usuario la ultima vez, o null si no hay rastro.
+ *
+ * Va por `useSyncExternalStore` y no por estado + efecto: el servidor
+ * prerenderiza sin la cookie (vive en el navegador), y este hook es justo el que
+ * sabe dar un valor distinto en servidor y cliente sin romper la hidratacion ni
+ * disparar un render en cascada.
+ */
+function useUltimoMetodo() {
+  return React.useSyncExternalStore(
+    sinCambios,
+    () => getLastUsedLoginMethod(),
+    () => null // en el servidor no hay cookie que leer
+  )
+}
+
+/** Marca el camino que el usuario ya conoce. No implica nada de seguridad. */
+function EtiquetaUltimoAcceso() {
+  return (
+    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+      Lo usaste la última vez
+    </span>
+  )
+}
 
 
 export function LoginForm({
@@ -48,6 +79,13 @@ export function LoginForm({
   const [verPassword, setVerPassword] = React.useState(false)
   const [cargando, setCargando] = React.useState(false)
   const [redirigiendo, setRedirigiendo] = React.useState(false)
+
+  // Con que entro el usuario la ultima vez, para resaltarle ese camino.
+  const ultimoMetodo = useUltimoMetodo()
+
+  // "email" es el nombre que le da Better Auth al login con correo y contrasena.
+  const ultimoFueCorreo = ultimoMetodo === "email"
+  const ultimoFueMicrosoft = ultimoMetodo === "microsoft"
 
   // El aviso sale de la URL: lo ponen el cierre de sesion, el middleware o el
   // rechazo de un login social. La tabla de mensajes vive en avisos-login.ts.
@@ -175,9 +213,12 @@ export function LoginForm({
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Campo: Correo Electrónico */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-foreground">
-              Correo electrónico
-            </label>
+            <div className="flex items-center justify-between gap-2">
+              <label htmlFor="email" className="text-sm font-semibold text-foreground">
+                Correo electrónico
+              </label>
+              {ultimoFueCorreo && <EtiquetaUltimoAcceso />}
+            </div>
             <div className="relative">
               <MailIcon
                 className={cn(
@@ -308,7 +349,11 @@ export function LoginForm({
                 ? undefined
                 : "Aún no está habilitado el ingreso con Microsoft."
             }
-            className="h-12 w-full gap-2.5 rounded-[10px] text-base font-medium"
+            className={cn(
+              "h-12 w-full gap-2.5 rounded-[10px] text-base font-medium",
+              // Resalta el boton si es el camino que ya uso el usuario.
+              ultimoFueMicrosoft && conMicrosoft && "border-primary/40 bg-primary/5"
+            )}
           >
             <svg viewBox="0 0 21 21" className="size-4 shrink-0" aria-hidden="true">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -318,6 +363,12 @@ export function LoginForm({
             </svg>
             Continuar con Microsoft
           </Button>
+
+          {ultimoFueMicrosoft && conMicrosoft && (
+            <div className="flex justify-center">
+              <EtiquetaUltimoAcceso />
+            </div>
+          )}
 
           {!conMicrosoft && (
             <p className="text-center text-xs text-muted-foreground">

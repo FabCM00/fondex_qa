@@ -23,8 +23,8 @@ export default async function Layout() {
     >
       <SidebarInset className="h-svh overflow-hidden">
         <DashboardHeader />
-        {/* El colaborador nunca ve la vista de usuarios: no se renderiza. */}
-        <ContenidoPrincipal vistaUsuarios={null} />
+        {/* El colaborador no ve las vistas de administracion: no se renderizan. */}
+        <ContenidoPrincipal vistaUsuarios={null} vistaEdicionMotor={null} />
       </SidebarInset>
     </DashboardShell>
   )

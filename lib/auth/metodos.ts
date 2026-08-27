@@ -1,6 +1,6 @@
 "use server"
 
-import { exigirSesion } from "@/lib/auth/sesion"
+import { exigirUsuario } from "@/lib/auth/sesion"
 import { prisma } from "@/lib/prisma"
 
 /** Los proveedores que la app reconoce, con su nombre para la UI. */
@@ -31,7 +31,7 @@ const FORMATO_FECHA = new Intl.DateTimeFormat("es-CO", {
  * guarda, y para saberlo habria que anotarlo en `session` al iniciar.
  */
 export async function cargarMetodosAcceso(): Promise<MetodoAcceso[]> {
-  const usuario = await exigirSesion("/dashboard")
+  const usuario = await exigirUsuario()
 
   const cuentas = await prisma.account.findMany({
     where: { userId: usuario.id },

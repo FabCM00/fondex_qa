@@ -23,27 +23,22 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   loading: () => <CargandoEditor />,
 })
 
-// Visor generico: recibe cualquier valor serializable, no sabe nada de
-// solicitudes. Sirve igual cuando el JSON venga de la base de datos.
-//
-// Con `onChange` pasa a ser editable: el padre recibe el texto crudo (no el
-// objeto) porque mientras se escribe el JSON esta roto a medias, y decidir que
-// hacer con eso es del padre, no del visor.
+// Visor generico de solo lectura: recibe cualquier valor serializable y no
+// sabe nada de solicitudes. Sirve igual cuando el JSON venga de la base de
+// datos. Los cambios al payload del motor se hacen por campos, no sobre el
+// texto crudo (ver components/motores).
 export function JsonViewer({
   value,
   etiqueta,
-  onChange,
   acciones,
 }: {
   value: unknown
   etiqueta?: string
-  onChange?: (texto: string) => void
   /** Controles extra en la barra, a la izquierda de "Copiar". */
   acciones?: React.ReactNode
 }) {
   const { resolvedTheme } = useTheme()
   const [copiado, setCopiado] = React.useState(false)
-  const editable = typeof onChange === "function"
 
   const contenido = React.useMemo(
     () => (typeof value === "string" ? value : JSON.stringify(value, null, 2)),
@@ -94,19 +89,18 @@ export function JsonViewer({
         <MonacoEditor
           language="json"
           value={contenido}
-          onChange={(texto) => onChange?.(texto ?? "")}
           theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
           height="100%"
           loading={<CargandoEditor />}
           options={{
-            readOnly: !editable,
-            domReadOnly: !editable,
+            readOnly: true,
+            domReadOnly: true,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             fontSize: 12,
             lineNumbers: "on",
             folding: true,
-            renderLineHighlight: editable ? "line" : "none",
+            renderLineHighlight: "none",
             scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
             overviewRulerLanes: 0,
             find: {

@@ -35,6 +35,7 @@ import {
   FileTextIcon,
   SettingsIcon,
   ShieldCheckIcon,
+  SlidersHorizontalIcon,
   UserRoundIcon,
   UsersIcon,
   type LucideIcon,
@@ -48,6 +49,7 @@ const ICONOS: Record<string, LucideIcon> = {
   FileText: FileTextIcon,
   Settings: SettingsIcon,
   ShieldCheck: ShieldCheckIcon,
+  SlidersHorizontal: SlidersHorizontalIcon,
   UserRound: UserRoundIcon,
   Users: UsersIcon,
 }
@@ -148,9 +150,7 @@ export function AppSidebar({
                             }
                           >
                             <Icono nombre={modulo.icono} />
-                            <span className="truncate">
-                              Módulo {modulo.titulo}
-                            </span>
+                            <span className="truncate">{modulo.titulo}</span>
                             <ChevronRightIcon className="ms-auto size-3.5 shrink-0 transition-transform duration-200 group-data-open/collapsible:rotate-90" />
                           </CollapsibleTrigger>
                           <CollapsibleContent>
