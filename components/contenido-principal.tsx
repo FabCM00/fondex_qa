@@ -10,15 +10,18 @@ import {
   VISTA_EDICION_MOTOR,
   VISTA_MI_PERFIL,
   VISTA_NOTIFICACIONES,
+  VISTA_PANEL,
   VISTA_PREFERENCIAS,
   VISTA_USUARIOS,
 } from "@/lib/navegacion"
 
 export function ContenidoPrincipal({
+  vistaPanel,
   vistaUsuarios,
   vistaEdicionMotor,
 }: {
   // Se reciben ya renderizadas desde el layout porque son Server Components.
+  vistaPanel: React.ReactNode
   vistaUsuarios: React.ReactNode
   vistaEdicionMotor: React.ReactNode
 }) {
@@ -29,6 +32,8 @@ export function ContenidoPrincipal({
   }
 
   switch (vistaActiva) {
+    case VISTA_PANEL:
+      return vistaPanel
     case VISTA_USUARIOS:
       return vistaUsuarios
     case VISTA_EDICION_MOTOR:

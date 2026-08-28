@@ -3,6 +3,7 @@ import type { Rol } from "@/lib/auth/roles"
 // Nombres de las vistas del sidebar. Viven aparte para que el sidebar, el
 // shell, el header y el contenido principal hablen del mismo identificador.
 
+export const VISTA_PANEL = "Panel"
 export const VISTA_ACTIVAS = "Solicitudes Activas"
 export const VISTA_GESTIONADAS = "Solicitudes Gestionadas"
 export const VISTA_USUARIOS = "Usuarios"
@@ -20,6 +21,12 @@ export function esVistaBandeja(vista: string) {
 /** Icono: nombre del icono de lucide que resuelve el sidebar. */
 export type Vista = { titulo: string; icono: string }
 export type Modulo = { titulo: string; icono: string; vistas: Vista[] }
+
+const MODULO_PANEL: Modulo = {
+  titulo: VISTA_PANEL,
+  icono: "Home",
+  vistas: [{ titulo: VISTA_PANEL, icono: "Home" }],
+}
 
 const MODULO_SOLICITUDES: Modulo = {
   titulo: "Solicitudes",
@@ -56,14 +63,14 @@ const MODULO_PERFIL: Modulo = {
 
 /** Que modulos ve cada rol. Fuente unica para el sidebar. */
 export const MODULOS_POR_ROL: Record<Rol, Modulo[]> = {
-  ADMIN: [MODULO_ADMINISTRACION, MODULO_PARAMETROS, MODULO_PERFIL],
-  COLABORADOR: [MODULO_SOLICITUDES, MODULO_PERFIL],
+  ADMIN: [MODULO_PANEL, MODULO_ADMINISTRACION, MODULO_PARAMETROS, MODULO_PERFIL],
+  COLABORADOR: [MODULO_PANEL, MODULO_SOLICITUDES, MODULO_PERFIL],
 }
 
-/** Vista inicial de cada rol (la primera de su primer modulo). */
+/** Vista inicial de cada rol: el Panel siempre recibe primero. */
 export const VISTA_INICIAL: Record<Rol, string> = {
-  ADMIN: VISTA_USUARIOS,
-  COLABORADOR: VISTA_ACTIVAS,
+  ADMIN: VISTA_PANEL,
+  COLABORADOR: VISTA_PANEL,
 }
 
 /** El rol puede abrir esa vista? Evita colarse cambiando el estado. */

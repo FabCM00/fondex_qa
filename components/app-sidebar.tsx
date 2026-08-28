@@ -34,6 +34,7 @@ import {
   ChevronRightIcon,
   ClockIcon,
   FileTextIcon,
+  HomeIcon,
   SettingsIcon,
   ShieldCheckIcon,
   SlidersHorizontalIcon,
@@ -48,6 +49,7 @@ const ICONOS: Record<string, LucideIcon> = {
   CheckCheck: CheckCheckIcon,
   Clock: ClockIcon,
   FileText: FileTextIcon,
+  Home: HomeIcon,
   Settings: SettingsIcon,
   ShieldCheck: ShieldCheckIcon,
   SlidersHorizontal: SlidersHorizontalIcon,
@@ -133,7 +135,30 @@ export function AppSidebar({
               <SidebarGroup className="p-2 pt-4">
                 <SidebarGroupContent>
                   <SidebarMenu className="gap-1">
-                    {modulos.map((modulo, indice) => (
+                    {modulos.map((modulo, indice) => {
+                      // Modulo de una sola vista con su mismo titulo: boton
+                      // directo, sin desplegable redundante (ej. Panel).
+                      const esVistaUnica =
+                        modulo.vistas.length === 1 &&
+                        modulo.vistas[0].titulo === modulo.titulo
+
+                      if (esVistaUnica) {
+                        return (
+                          <SidebarMenuItem key={modulo.titulo}>
+                            <SidebarMenuButton
+                              isActive={vistaActiva === modulo.titulo}
+                              onClick={() => seleccionarVista(modulo.titulo)}
+                              render={<button type="button" />}
+                              className="h-8 w-full px-2 font-medium data-active:bg-sidebar-primary/10 data-active:text-sidebar-accent-foreground"
+                            >
+                              <Icono nombre={modulo.icono} />
+                              <span className="truncate">{modulo.titulo}</span>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        )
+                      }
+
+                      return (
                       <SidebarMenuItem key={modulo.titulo}>
                         <Collapsible
                           className="group/collapsible"
@@ -176,7 +201,8 @@ export function AppSidebar({
                           </CollapsibleContent>
                         </Collapsible>
                       </SidebarMenuItem>
-                    ))}
+                      )
+                    })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

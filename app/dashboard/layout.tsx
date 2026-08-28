@@ -1,6 +1,7 @@
 import { ContenidoPrincipal } from "@/components/contenido-principal"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardShell } from "@/components/dashboard-shell"
+import { VistaPanelServer } from "@/components/panel/vista-panel-server"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { exigirSesion } from "@/lib/auth/sesion"
 import { contarPorEstado, listarSolicitudes } from "@/lib/solicitudes/repo"
@@ -24,7 +25,11 @@ export default async function Layout() {
       <SidebarInset className="h-svh overflow-hidden">
         <DashboardHeader />
         {/* El colaborador no ve las vistas de administracion: no se renderizan. */}
-        <ContenidoPrincipal vistaUsuarios={null} vistaEdicionMotor={null} />
+        <ContenidoPrincipal
+          vistaPanel={<VistaPanelServer usuario={usuario} />}
+          vistaUsuarios={null}
+          vistaEdicionMotor={null}
+        />
       </SidebarInset>
     </DashboardShell>
   )
