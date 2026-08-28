@@ -69,9 +69,10 @@ export function SolicitudDetalle() {
   }
   const [pestana, setPestana] = React.useState<PestanaId>("resumen")
 
-  // Los JSON de los motores se piden al abrir: mientras llegan se pinta la
-  // forma del detalle, para que no salte cuando lleguen los datos.
-  if (cargandoDetalle && !solicitud) {
+  // Los JSON de los motores se piden al abrir o al cambiar de solicitud:
+  // mientras llegan se pinta la forma del detalle, para que no se quede el
+  // contenido de la solicitud anterior mientras carga la nueva.
+  if (cargandoDetalle) {
     return <EsqueletoDetalle />
   }
 

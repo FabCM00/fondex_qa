@@ -7,6 +7,7 @@ import { BandejaSolicitudes } from "@/components/bandeja-solicitudes"
 import { useDashboard } from "@/components/dashboard-context"
 import { NavUser } from "@/components/nav-user"
 import { SolicitudesFilter } from "@/components/solicitudes-filter"
+import { MARCA } from "@/lib/marca"
 import {
   Collapsible,
   CollapsibleContent,
@@ -107,8 +108,8 @@ export function AppSidebar({
                   >
                     <div className="flex aspect-square size-7 items-center justify-center rounded-lg">
                       <Image
-                        src="/logos/logo1.png"
-                        alt="WANT N' GET"
+                        src={MARCA.logo}
+                        alt={MARCA.nombre}
                         width={28}
                         height={28}
                         className="size-full object-contain"
@@ -116,7 +117,7 @@ export function AppSidebar({
                     </div>
                     <div className="grid flex-1 text-start leading-tight">
                       <span className="truncate text-sm font-medium">
-                        WANT N&apos; GET
+                        {MARCA.nombre}
                       </span>
                       <span className="truncate text-[10px] text-muted-foreground">
                         {usuario.rol === "ADMIN"

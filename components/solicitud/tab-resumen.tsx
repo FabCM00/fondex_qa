@@ -29,9 +29,17 @@ function Progreso({ cumplen, total }: { cumplen: number; total: number }) {
 }
 
 export function TabResumen({ solicitud }: { solicitud: Solicitud }) {
+  // Solo se muestran las secciones/grupos cuyo paso ya llego para esta
+  // solicitud: si el motor aun no la proceso, no tiene sentido mostrar la
+  // seccion entera llena de guiones.
+  const secciones = SECCIONES.filter(
+    (seccion) => solicitud.pasosDisponibles[seccion.paso]
+  )
+  const grupos = GRUPOS.filter((grupo) => solicitud.pasosDisponibles[grupo.paso])
+
   return (
     <div className="flex flex-col gap-6">
-      {SECCIONES.map((seccion) => (
+      {secciones.map((seccion) => (
         <section key={seccion.titulo}>
           <Titulo>{seccion.titulo}</Titulo>
           <dl className="grid grid-cols-1 border-s border-t sm:grid-cols-2">
@@ -49,7 +57,7 @@ export function TabResumen({ solicitud }: { solicitud: Solicitud }) {
         </section>
       ))}
 
-      {GRUPOS.map((grupo) => {
+      {grupos.map((grupo) => {
         const cumplen = grupo.criterios.filter(
           (criterio) => solicitud.criterios[criterio.key]
         ).length

@@ -13,14 +13,12 @@ import {
 } from "@/lib/solicitudes/schema"
 import { prisma } from "@/lib/prisma"
 
-// valida1_results es la tabla padre: desde ahi se traen las tres relaciones.
-//
-// motor_data_results es 1:N en la base (una solicitud puede reprocesarse), asi
-// que llega como arreglo: se toma el envio mas reciente.
+// valida1_results es la tabla padre: desde ahi se traen las relaciones.
 const RELACIONES = {
-  motor_data_results: { orderBy: { updated_at: "desc" }, take: 1 },
+  motor_data_results: true,
   motor_process_results: true,
-  identity_validations: true,
+  identity_results: true,
+  credit_tracking: true,
 } as const
 
 /** Fila cruda del listado: Postgres ya derivo el estado y extrajo la tarjeta. */
@@ -47,19 +45,15 @@ const monedaCO = new Intl.NumberFormat("es-CO", {
 })
 
 /**
- * El nombre de la tarjeta. Viene partido en tres columnas del JSON de
- * motor-data (`detallado_want`), y si esa solicitud no llego al motor se cae a
- * la ficha de valida 1 (`datos_asociado`). Se arma en SQL para no traer los
- * response_json completos al listar.
+ * El nombre de la tarjeta. motor-data trae el nombre completo ya armado en
+ * `datos_asociado.deudor`; si la solicitud no llego al motor se cae al de
+ * valida 1 (`datos_asociado.nombre_completo`). Se arma en SQL para no traer
+ * los response_json completos al listar.
  */
 const SQL_NOMBRE = `
-  nullif(trim(concat_ws(' ',
-    coalesce(md.response_json->'detallado_want'->>'nombre',
-             v.response_json->'datos_asociado'->>'nombre'),
-    coalesce(md.response_json->'detallado_want'->>'primer_apellido',
-             v.response_json->'datos_asociado'->>'primer_apellido'),
-    coalesce(md.response_json->'detallado_want'->>'segundo_apellido',
-             v.response_json->'datos_asociado'->>'segundo_apellido')
+  nullif(trim(coalesce(
+    md.response_json->'datos_asociado'->>'deudor',
+    v.response_json->'datos_asociado'->>'nombre_completo'
   )), '')`
 
 /**
@@ -73,56 +67,51 @@ const SQL_ESTADO = `
     WHEN v.estado_manual IS NOT NULL THEN v.estado_manual
 
     WHEN iv.radicado IS NULL THEN
-      CASE WHEN (v.response_json->'result'->>'valida1') = '1'
+      CASE WHEN (v.response_json->>'motor1') = '1'
            THEN 'valida_1' ELSE 'no_valida_1' END
 
-    WHEN md.radicado IS NULL THEN
-      CASE
-        WHEN lower(coalesce(iv.response_json->>'status_face', '')) IN ('1', 'success')
-             AND (
-               ((iv.response_json->>'tipo_validacion') = '1'
-                AND lower(coalesce(iv.response_json->>'status_document', '')) IN ('1', 'success'))
-               OR (iv.response_json->>'tipo_validacion') = '2'
-             )
-          THEN 'val_identidad'
-        WHEN lower(coalesce(iv.response_json->>'status_document', '')) IN ('2', 'failed')
-             OR lower(coalesce(iv.response_json->>'status_face', '')) IN ('2', 'failed')
-          THEN 'no_val_identidad'
-        ELSE 'revision'
-      END
+    WHEN md.radicado IS NULL
+         AND (iv.response_json->>'status_face') = '1'
+         AND (
+           ((iv.response_json->>'tipo_validacion') = '1'
+            AND (iv.response_json->>'status_document') = '1')
+           OR (iv.response_json->>'tipo_validacion') = '2'
+         )
+      THEN 'val_identidad'
 
-    WHEN mp.radicado IS NULL
-         OR lower(trim(coalesce(mp.response_json->>'status', ''))) <> 'ok'
+    WHEN md.radicado IS NULL
+         AND ((iv.response_json->>'status_document') = '2'
+              OR (iv.response_json->>'status_face') = '2')
+      THEN 'no_val_identidad'
+
+    WHEN mp.radicado IS NOT NULL
+         AND trim(coalesce(mp.response_json->>'status', '')) <> 'ok'
       THEN 'fallo_servicios'
 
-    WHEN (mp.response_json->'processing'->>'instanciaAprobacion') = '2' THEN 'no_viable'
-    WHEN (mp.response_json->'processing'->>'instanciaAprobacion') = '1' THEN 'preaprobado'
+    WHEN (mp.response_json->>'motor2') = '2' THEN 'no_viable'
+
+    WHEN (mp.response_json->>'motor2') = '1' AND ct.req_143 = 'E' THEN 'preaprobado'
+    WHEN (mp.response_json->>'motor2') = '1' AND ct.req_143 = 'A' THEN 'aprobado'
+    WHEN (mp.response_json->>'motor2') = '1' AND ct.req_143 = 'C' THEN 'contabilizado'
 
     ELSE 'revision'
   END`
 
-/**
- * Los JOIN que necesita SQL_ESTADO. motor_data es 1:N (una solicitud puede
- * reprocesarse), asi que se toma el envio mas reciente.
- */
+/** Los JOIN que necesita SQL_ESTADO. Todas las relaciones son 1:1 por radicado. */
 const SQL_JOINS = `
-    LEFT JOIN identity_validations iv  ON iv.radicado = v.radicado
-    LEFT JOIN motor_process_results mp ON mp.radicado = v.radicado
-    LEFT JOIN LATERAL (
-      SELECT radicado, response_json
-      FROM motor_data_results
-      WHERE radicado = v.radicado
-      ORDER BY updated_at DESC
-      LIMIT 1
-    ) md ON true`
+    LEFT JOIN identity_results iv       ON iv.radicado = v.radicado
+    LEFT JOIN motor_process_results mp  ON mp.radicado = v.radicado
+    LEFT JOIN motor_data_results md     ON md.radicado = v.radicado
+    LEFT JOIN credit_tracking ct        ON ct.radicado = v.radicado`
 
 /**
  * Que separa las dos pestanas: una solicitud esta "gestionada" cuando alguien
- * le puso el estado a mano (estado_manual). Todo lo demas sigue activo, sin
- * importar en que etapa del flujo lo dejaron las reglas: que una solicitud sea
- * `no_viable` o `no_valida_1` no significa que alguien ya la haya revisado.
+ * la reviso (gestionado_at, lo pone marcarGestionada). Todo lo demas sigue
+ * activo, sin importar en que etapa del flujo lo dejaron las reglas: que una
+ * solicitud sea `no_viable` o `no_valida_1` no significa que alguien ya la
+ * haya revisado.
  */
-const SQL_GESTIONADA = `(v.estado_manual IS NOT NULL)`
+const SQL_GESTIONADA = `(v.gestionado_at IS NOT NULL)`
 
 /**
  * Una pagina de la bandeja.
@@ -160,9 +149,9 @@ export async function listarSolicitudes(
     SELECT
       v.radicado,
       v.cedula,
-      (${SQL_ESTADO})                                        AS estado,
-      ${SQL_NOMBRE}                                          AS nombre,
-      md.response_json->'detallado_want'->>'montoSolicitado' AS monto
+      (${SQL_ESTADO})                            AS estado,
+      ${SQL_NOMBRE}                              AS nombre,
+      mp.response_json->'oferta'->>'monto'        AS monto
     FROM valida1_results v
     ${SQL_JOINS}
     ${filtros}
@@ -267,10 +256,10 @@ export async function obtenerSolicitud(
     gestionado_nota: fila.gestionado_nota,
     estado_manual: fila.estado_manual,
     validate: fila,
-    // El include trae solo el mas reciente (take: 1), pero sigue siendo arreglo.
-    motorData: fila.motor_data_results[0] ?? null,
+    motorData: fila.motor_data_results,
     motorProcess: fila.motor_process_results,
-    identidad: fila.identity_validations,
+    identidad: fila.identity_results,
+    estado143: fila.credit_tracking?.req_143 ?? null,
   })
 }
 

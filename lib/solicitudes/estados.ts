@@ -7,6 +7,7 @@ export const SOLICITUD_ESTADOS = [
   "no_viable",
   "preaprobado",
   "aprobado",
+  "contabilizado",
   "revision",
 ] as const
 
@@ -21,6 +22,7 @@ export const ESTADO_LABEL: Record<SolicitudEstado, string> = {
   no_viable: "No viable",
   preaprobado: "Preaprobado",
   aprobado: "Aprobado",
+  contabilizado: "Contabilizado",
   revision: "Revisión",
 }
 
@@ -35,6 +37,8 @@ export const ESTADO_STYLES: Record<SolicitudEstado, string> = {
   preaprobado:
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   aprobado:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  contabilizado:
     "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   revision: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
 }
@@ -53,7 +57,10 @@ export const ESTADOS_ASIGNABLES: readonly SolicitudEstado[] = [
   "aprobado",
 ]
 
-export const ESTADOS_TERMINALES: readonly SolicitudEstado[] = ["aprobado"]
+export const ESTADOS_TERMINALES: readonly SolicitudEstado[] = [
+  "aprobado",
+  "contabilizado",
+]
 
 export function esSolicitudEstado(valor: unknown): valor is SolicitudEstado {
   return (SOLICITUD_ESTADOS as readonly unknown[]).includes(valor)
@@ -73,32 +80,16 @@ export function parsearEstadoManual(
   return esSolicitudEstado(valor) ? valor : null
 }
 
-function esExito(valor: unknown): boolean {
-  if (valor === 1) return true
-  const texto = String(valor ?? "")
-    .trim()
-    .toLowerCase()
-  return texto === "1" || texto === "success"
-}
-
-function esFalla(valor: unknown): boolean {
-  if (valor === 2) return true
-  const texto = String(valor ?? "")
-    .trim()
-    .toLowerCase()
-  return texto === "2" || texto === "failed"
-}
-
 export type EntradasEstado = {
-  valida1: number | null
+  motor1: number | null
   existeIdentidad: boolean
-  statusFace: unknown
-  statusDocument: unknown
+  statusFace: number | null
+  statusDocument: number | null
   tipoValidacion: number | null
   existeMotorData: boolean
-  existeMotorProcess: boolean
-  motorStatus: string | null
-  motorInstancia: number | null
+  motorProcessStatus: string | null
+  motor2: number | null
+  estado143: string | null
   estadoManual?: SolicitudEstado | null
 }
 
@@ -106,31 +97,33 @@ export function derivarEstado(entradas: EntradasEstado): SolicitudEstado {
   if (entradas.estadoManual) return entradas.estadoManual
 
   if (!entradas.existeIdentidad) {
-    return entradas.valida1 === 1 ? "valida_1" : "no_valida_1"
+    return entradas.motor1 === 1 ? "valida_1" : "no_valida_1"
   }
 
   if (!entradas.existeMotorData) {
     if (
-      esExito(entradas.statusFace) &&
-      ((entradas.tipoValidacion === 1 && esExito(entradas.statusDocument)) ||
+      entradas.statusFace === 1 &&
+      ((entradas.tipoValidacion === 1 && entradas.statusDocument === 1) ||
         entradas.tipoValidacion === 2)
     ) {
       return "val_identidad"
     }
-    if (esFalla(entradas.statusDocument) || esFalla(entradas.statusFace)) {
+    if (entradas.statusDocument === 2 || entradas.statusFace === 2) {
       return "no_val_identidad"
     }
-    return "revision"
   }
 
-  if (
-    !entradas.existeMotorProcess ||
-    (entradas.motorStatus ?? "").trim().toLowerCase() !== "ok"
-  ) {
+  if (entradas.motorProcessStatus !== null && entradas.motorProcessStatus !== "ok") {
     return "fallo_servicios"
   }
-  if (entradas.motorInstancia === 2) return "no_viable"
-  if (entradas.motorInstancia === 1) return "preaprobado"
+
+  if (entradas.motor2 === 2) return "no_viable"
+
+  if (entradas.motor2 === 1) {
+    if (entradas.estado143 === "E") return "preaprobado"
+    if (entradas.estado143 === "A") return "aprobado"
+    if (entradas.estado143 === "C") return "contabilizado"
+  }
 
   return "revision"
 }

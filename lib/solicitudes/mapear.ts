@@ -11,17 +11,18 @@ import type {
   SolicitudResumen,
 } from "@/lib/solicitudes/schema"
 
-// Adaptador: convierte los JSON crudos de los motores de Coopvalili al modelo
-// que consume la bandeja. Todo acceso es defensivo porque los servicios no
+// Adaptador: convierte los JSON crudos de los motores de Fondex al modelo que
+// consume la bandeja. Todo acceso es defensivo porque los servicios no
 // siempre devuelven las mismas claves.
 //
 // De donde sale cada cosa:
-//   validate.response      -> result.{valida1,valida_edad,valida_activo,
-//                             valida_asociado} y datos_asociado.{...}
-//   motor-data.response    -> detallado_want.{...}
-//   motor-process.response -> processing.{...}
-//   identidad.response     -> status_document / status_face / estado_validacion
-//                             (1 = ok, 0 = falla)
+//   validate.response      -> motor1, valida_id/valida_email/valida_celular/
+//                             valida_estado_laboral, datos_asociado.{...}
+//   motor-data.response    -> detallado.{...}, datos_asociado.{...},
+//                             api_responses.linix_109/118/134/136/151
+//   motor-process.response -> oferta.{...}, processing.{...}
+//   identidad.response     -> status_document / status_face / tipo_validacion
+//                             ("success"/1 = ok, "failed"/2 = falla)
 
 type Json = Record<string, unknown>
 
@@ -63,6 +64,14 @@ function fraccionComoPorcentaje(valor: unknown, decimales = 2): string {
   return Number.isFinite(numero) ? `${(numero * 100).toFixed(decimales)}%` : "—"
 }
 
+/** Como fraccionComoPorcentaje, pero con un sufijo propio (" M.V.", " E.A."). */
+function porcentajeFraccion(valor: unknown, decimales: number, sufijo: string): string {
+  const numero = Number(valor)
+  return Number.isFinite(numero)
+    ? `${(numero * 100).toFixed(decimales)}${sufijo}`
+    : "—"
+}
+
 /**
  * Nombre de respaldo cuando los motores no devolvieron ninguno. La cedula es
  * nullable en la base, asi que puede no haber ni eso.
@@ -70,17 +79,25 @@ function fraccionComoPorcentaje(valor: unknown, decimales = 2): string {
 const etiquetaCedula = (cedula: string | null | undefined): string =>
   cedula?.trim() ? `C.C. ${cedula.trim()}` : "Sin identificar"
 
-/** Une los nombres y apellidos que vienen en campos separados. */
-function nombreCompleto(fuente: Json): string {
-  const partes = [
-    fuente.nombre,
-    fuente.primer_apellido,
-    fuente.segundo_apellido,
-  ]
-    .map((parte) => (typeof parte === "string" ? parte.trim() : ""))
-    .filter(Boolean)
+/**
+ * Anos completos entre una fecha (ISO o "YYYY-MM-DD") y hoy. Se usa para
+ * edad y antiguedad: el motor no los entrega ya calculados, solo las fechas
+ * crudas (fecha_nacimiento, fecha_ingreso_empresa, fecha_antiguedad).
+ */
+function anosDesde(fecha: unknown): number | null {
+  if (typeof fecha !== "string" || !fecha.trim()) return null
 
-  return partes.join(" ")
+  const inicio = new Date(fecha)
+  if (Number.isNaN(inicio.getTime())) return null
+
+  const hoy = new Date()
+  let anos = hoy.getFullYear() - inicio.getFullYear()
+  const aunNoCumple =
+    hoy.getMonth() < inicio.getMonth() ||
+    (hoy.getMonth() === inicio.getMonth() && hoy.getDate() < inicio.getDate())
+  if (aunNoCumple) anos -= 1
+
+  return anos >= 0 ? anos : null
 }
 
 /** "52177381_260819213644" -> "19/08/2026 21:36" */
@@ -139,6 +156,8 @@ export type FilasSolicitud = {
   motorData?: { request_json?: unknown; response_json?: unknown } | null
   motorProcess?: { request_json?: unknown; response_json?: unknown } | null
   identidad?: { request_json?: unknown; response_json?: unknown } | null
+  /** req_143 de credit_tracking: "E" preaprobado, "A" aprobado, "C" contabilizado. */
+  estado143?: string | null
 }
 
 export function mapearSolicitud(filas: FilasSolicitud): Solicitud {
@@ -147,139 +166,159 @@ export function mapearSolicitud(filas: FilasSolicitud): Solicitud {
   const motorProcessRes = comoJson(filas.motorProcess?.response_json)
   const identidadRes = comoJson(filas.identidad?.response_json)
 
-  // Valida 1 devuelve los criterios en `result` y la ficha del asociado en
-  // `datos_asociado`; motor-data condensa todo en `detallado_want`.
-  const resultado = comoJson(validateRes.result)
-  const asociado = comoJson(validateRes.datos_asociado)
-  const detallado = comoJson(motorDataRes.detallado_want)
+  // Valida 1 trae las banderas de cumplimiento sueltas y la ficha del
+  // asociado en `datos_asociado`; motor-data trae la ficha ampliada en su
+  // propio `datos_asociado` y el detalle (score, cedula) en `detallado`.
+  const asociadoValida1 = comoJson(validateRes.datos_asociado)
+  const asociadoMotor = comoJson(motorDataRes.datos_asociado)
+  const apiResponses = comoJson(motorDataRes.api_responses)
+  const oferta = comoJson(motorProcessRes.oferta)
   const proceso = comoJson(motorProcessRes.processing)
 
-  const paso1 = Number(resultado.valida1) === 1
-  const hayProcess = Object.keys(proceso).length > 0
+  // linix_109/118/134/136/151: arreglos de una sola fila con datos crudos del
+  // core Linix. Se usan solo cuando motor-data no los trajo ya resumidos en
+  // datos_asociado (que es el caso normal).
+  const linix109 = comoJson((apiResponses.linix_109 as Json[] | undefined)?.[0])
+  const linix118 = comoJson((apiResponses.linix_118 as Json[] | undefined)?.[0])
+  const linix134 = comoJson((apiResponses.linix_134 as Json[] | undefined)?.[0])
+
+  const paso1 = Number(validateRes.motor1) === 1
+  const hayProcess = Object.keys(proceso).length > 0 || Object.keys(oferta).length > 0
+
+  const numeroONulo = (valor: unknown): number | null =>
+    valor === undefined || valor === null ? null : Number(valor)
 
   // Las mismas reglas que aplica el SQL de la bandeja, pero sobre los payloads
   // ya cargados. La existencia de cada paso se infiere de que su fila trajo
   // JSON: obtenerSolicitud pasa null cuando la relacion no existe.
   const estado = derivarEstado({
-    valida1: resultado.valida1 === undefined ? null : Number(resultado.valida1),
+    motor1: numeroONulo(validateRes.motor1),
     existeIdentidad: Boolean(filas.identidad),
-    statusFace: identidadRes.status_face,
-    statusDocument: identidadRes.status_document,
-    tipoValidacion:
-      identidadRes.tipo_validacion === undefined
-        ? null
-        : Number(identidadRes.tipo_validacion),
+    statusFace: numeroONulo(identidadRes.status_face),
+    statusDocument: numeroONulo(identidadRes.status_document),
+    tipoValidacion: numeroONulo(identidadRes.tipo_validacion),
     existeMotorData: Boolean(filas.motorData),
-    existeMotorProcess: Boolean(filas.motorProcess),
-    motorStatus:
-      typeof motorProcessRes.status === "string" ? motorProcessRes.status : null,
-    motorInstancia:
-      proceso.instanciaAprobacion === undefined
-        ? null
-        : Number(proceso.instanciaAprobacion),
+    motorProcessStatus:
+      typeof motorProcessRes.status === "string"
+        ? motorProcessRes.status.trim().toLowerCase()
+        : filas.motorProcess
+          ? ""
+          : null,
+    motor2: numeroONulo(motorProcessRes.motor2),
+    estado143: filas.estado143 ?? null,
     estadoManual: parsearEstadoManual(filas.estado_manual),
   })
 
-  // El nombre puede venir de motor-data o de la ficha de valida 1; si la cedula
-  // no existe en la cooperativa no llega ninguno.
+  // El nombre puede venir de motor-data (datos_asociado.deudor), de valida 1
+  // (datos_asociado.nombre_completo) o del request original; si la cedula no
+  // existe en la cooperativa no llega ninguno.
   const nombre =
-    nombreCompleto(detallado) ||
-    nombreCompleto(asociado) ||
+    comoTexto(asociadoMotor.deudor) !== "—" ? String(asociadoMotor.deudor) : ""
+  const nombreFinal =
+    nombre || (comoTexto(asociadoValida1.nombre_completo) !== "—"
+      ? String(asociadoValida1.nombre_completo)
+      : "") ||
     etiquetaCedula(filas.cedula)
 
-  // `usuarioCredito` es una bandera 1/0 del motor, no un identificador: el
-  // numero de usuario esta en la ficha del asociado de motor-data.
-  const esUsuarioCredito = Number(proceso.usuarioCredito) === 1
+  const edad = anosDesde(linix134.FECHA_NACIMIENTO)
+  const antiguedadEficacia = anosDesde(
+    asociadoMotor.fechaEficacia ?? linix109.FECHA_INGRESO_EMPRESA
+  )
+  const antiguedadFondo = anosDesde(
+    asociadoMotor.fechaFondex ?? linix109.FECHA_ANTIGUEDAD
+  )
 
   const campos: Record<CampoKey, string> = {
     // Solicitante
-    nombreCompleto: nombre,
+    nombreCompleto: nombreFinal,
     cedula: comoTexto(filas.cedula),
-    edad: detallado.edad ? `${detallado.edad} años` : "—",
-    antiguedadLaboral: detallado.antiguedadLaboral
-      ? `${decimal(detallado.antiguedadLaboral, 1)} años`
-      : "—",
-    celular: comoTexto(asociado.celular),
-    email: comoTexto(asociado.email),
+    celular: comoTexto(asociadoValida1.celular ?? asociadoMotor.celular),
+    email: comoTexto(asociadoValida1.email ?? asociadoMotor.email),
+
+    // Datos laborales
+    edad: edad !== null ? `${edad} años` : "—",
+    antiguedadEficacia:
+      antiguedadEficacia !== null ? `${antiguedadEficacia} año(s)` : "—",
+    antiguedadFondo: antiguedadFondo !== null ? `${antiguedadFondo} año(s)` : "—",
+    estadoLaboral: comoTexto(asociadoMotor.estadoEficacia),
+    tipoContrato: comoTexto(asociadoMotor.tipoContrato),
+    seccion: comoTexto(asociadoMotor.seccionNombre ?? linix118.SECCION),
+    salarioBase: moneda(asociadoMotor.salarioBase),
+    otrosIngresos: moneda(asociadoMotor.otroSalario),
+    creditosVigentes: moneda(asociadoMotor.creditosVigentes),
+    aportesSociales: moneda(asociadoMotor.aportes),
+    segSocial: moneda(asociadoMotor.segSocial),
+    descuentosFondo: moneda(asociadoMotor.descuentosFondo),
 
     // Solicitud
-    montoSolicitado: moneda(detallado.montoSolicitado),
-    lineaCredito: comoTexto(detallado.lineaCredito),
-    perfil: comoTexto(proceso.perfil),
-    salario: moneda(detallado.salario),
-    egresosVolante: moneda(
-      proceso.egresosvolanteAjustado ?? detallado.egresosVolante
-    ),
-    deudaCooperativa: moneda(detallado.deudaCoopvalili),
-    conceptoDefinitivo: comoTexto(proceso.conceptoDefinitivo),
-    cuotaDefinitiva: moneda(proceso.cuotaDefinitiva),
-    frecuenciaPago: comoTexto(detallado.frecuenciaPagos),
-    usuarioCredito: hayProcess ? (esUsuarioCredito ? "Sí" : "No") : "—",
+    lineaCredito: comoTexto(oferta.linea),
+    montoAprobado: moneda(oferta.monto),
+    plazo: oferta.plazo ? `${oferta.plazo} meses` : "—",
+    cuotaMensual: moneda(oferta.cuota_mensual),
+    tasaMesVencida: porcentajeFraccion(oferta.tasa_mes_vencida, 4, "% M.V."),
+    tasaEfectivaAnual: porcentajeFraccion(oferta.tasa_efectiva_anual, 2, "% E.A."),
 
-    // Analisis del motor
-    ingresos: moneda(proceso.ingresos),
-    egresos: moneda(proceso.egresos),
-    minimoVital: moneda(proceso.minimoVital),
-    solvencia: fraccionComoPorcentaje(proceso.solvencia),
-    desprotegido: moneda(proceso.desprotegido),
-    disponible: moneda(proceso.disponible),
-    endeudamientoActual: fraccionComoPorcentaje(proceso.endActual),
-    endeudamientoProyectado: fraccionComoPorcentaje(proceso.endProyectado),
+    // Analisis financiero
+    egresosTotales: moneda(proceso.egresoTotal),
+    egresoFamiliar: moneda(proceso.egresoFam),
+    solvencia: decimal(proceso.solvencia, 4),
+    capacidadPagoDisponible: fraccionComoPorcentaje(proceso.capacPagoDisp),
+    cupoMaximo: moneda(proceso.cupoMax),
+    disponibleCuota: moneda(proceso.disponibleDesp),
+
+    // Scoring Fondex
+    scoreTotal: decimal(proceso.scoreFondex, 2),
+    perfilFondex: comoTexto(proceso.perfilFondex),
+    puntosEdad: comoTexto(proceso.puntosEdad),
+    puntosSalario: comoTexto(proceso.puntoSalario),
+    puntosFondex: comoTexto(proceso.puntosFondex),
+    puntosCreditos: comoTexto(proceso.puntosCreditos),
+    puntosEficacia: comoTexto(proceso.puntosEficacia),
+    puntosCaptacion: comoTexto(proceso.puntosCapta),
   }
 
   const criterios: Record<CriterioKey, boolean> = {
     // Valida 1: el filtro de entrada. 1 = cumple.
-    valida1Inicial: Number(resultado.valida1) === 1,
-    validaEdad: Number(resultado.valida_edad) === 1,
-    validaActivo: Number(resultado.valida_activo) === 1,
-    validaAsociado: Number(resultado.valida_asociado) === 1,
+    resultadoValidacion1: Number(validateRes.motor1) === 1,
+    validaIdentidad: Number(validateRes.valida_id) === 1,
+    validaEmail: Number(validateRes.valida_email) === 1,
+    validaCelular: Number(validateRes.valida_celular) === 1,
+    validaEstadoLaboral: Number(validateRes.valida_estado_laboral) === 1,
 
-    // Identidad: el servicio normaliza los "success" del request a 1/0.
     estadoDocumento: Number(identidadRes.status_document) === 1,
     estadoFacial: Number(identidadRes.status_face) === 1,
-    estadoGeneral: Number(identidadRes.estado_validacion) === 1,
 
-    // Motor de credito: las banderas de politica. 1 = cumple, 2 = no cumple.
-    cumpleEndeudamiento: Number(proceso.cumpleEnd) === 1,
-    cumpleSolvencia: Number(proceso.cumpleSol) === 1,
-    cumpleDisponible: Number(proceso.cumpleDis) === 1,
-    cumpleDesprotegido: Number(proceso.cumpleDes) === 1,
-    cumple4Criterios: Number(proceso.cumpl4Criterios) === 1,
+    // Motor de credito: viabilidad. 1 = cumple, 2 = no cumple.
+    viabilidadDefinitiva: Number(proceso.viabilidadDef) === 1,
+    viabilidadCriterio1: Number(proceso.viabilidad1) === 1,
   }
 
   // Valida 1 no entrega una lista de motivos: cuando algo no cumple se arma
-  // desde los criterios que fallaron, y el motor aporta su concepto.
+  // desde los criterios que fallaron, y el motor aporta su mensaje.
   const motivos: string[] = []
 
   if (!paso1) {
     const fallas: [boolean, string][] = [
-      [criterios.validaEdad, "No cumple la validación de edad."],
-      [criterios.validaActivo, "El asociado no está activo."],
-      [criterios.validaAsociado, "No figura como asociado de la cooperativa."],
+      [criterios.validaIdentidad, "No cumple la validación de identidad."],
+      [criterios.validaEmail, "No cumple la validación de email."],
+      [criterios.validaCelular, "No cumple la validación de celular."],
+      [criterios.validaEstadoLaboral, "No cumple el estado laboral."],
     ]
     for (const [cumple, motivo] of fallas) {
       if (!cumple) motivos.push(motivo)
     }
-    if (motivos.length === 0 && typeof resultado.mensaje === "string") {
-      motivos.push(resultado.mensaje)
+    if (motivos.length === 0 && typeof validateRes.mensaje === "string") {
+      motivos.push(validateRes.mensaje)
     }
   }
 
-  if (hayProcess && proceso.conceptoDefinitivo === "No viable") {
-    const fallas: [boolean, string][] = [
-      [criterios.cumpleEndeudamiento, "No cumple endeudamiento."],
-      [criterios.cumpleSolvencia, "No cumple solvencia."],
-      [criterios.cumpleDisponible, "No cumple disponible."],
-      [criterios.cumpleDesprotegido, "No cumple desprotegido."],
-    ]
-    for (const [cumple, motivo] of fallas) {
-      if (!cumple) motivos.push(motivo)
-    }
+  if (hayProcess && Number(motorProcessRes.motor2) === 2) {
+    motivos.push("No viable según el motor de crédito.")
   }
 
   return {
     radicado: filas.radicado,
-    nombre,
+    nombre: nombreFinal,
     gestion: filas.gestionado_at
       ? {
           por: filas.gestionado_by ?? "—",
@@ -288,12 +327,18 @@ export function mapearSolicitud(filas: FilasSolicitud): Solicitud {
         }
       : null,
     cedula: comoTexto(filas.cedula),
-    monto: moneda(detallado.montoSolicitado),
+    monto: moneda(oferta.monto),
     fecha: fechaDeRadicado(filas.radicado),
     estado,
     campos,
     criterios,
     motivos,
+    pasosDisponibles: {
+      validate: Boolean(filas.validate),
+      "motor-data": Boolean(filas.motorData),
+      "motor-process": Boolean(filas.motorProcess),
+      identidad: Boolean(filas.identidad),
+    },
     payloads: {
       validate: {
         request: filas.validate?.request_json,

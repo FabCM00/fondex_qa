@@ -3,8 +3,9 @@
 // lo busca, y `tsx` (ESM puro) falla al importarlo. Generarlo aqui hace que la
 // ruta sea explicita y funcione igual en Next y en los scripts.
 generator client {
-  provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -15,12 +16,10 @@ datasource db {
 // AUTENTICACION (Better Auth)
 //
 // Es lo unico que este proyecto crea en la base. Las tablas de datos de abajo
-// ya existian en coopvalili_db con datos productivos y se describen tal como
+// ya existian en la base con datos productivos y se describen tal como
 // estan (ver prisma/migrations/*_baseline_datos_motor).
 //
-// Los roles son solo ADMIN y COLABORADOR. La base venia con USER del sistema
-// anterior: la migracion convierte esas filas a COLABORADOR y saca el valor
-// del enum.
+// Los roles son solo ADMIN y COLABORADOR.
 // ---------------------------------------------------------------------------
 
 enum Role {
@@ -147,21 +146,21 @@ model RateLimit {
 // DATOS DEL MOTOR
 //
 // Todo lo de aqui abajo ya existe en la base con datos productivos. Se
-// describe tal cual: no se renombra ninguna tabla ni se cambia la nulabilidad
-// de ninguna columna. Lo unico que este proyecto agrego es
-// valida1_results.gestionado_nota.
+// describe tal cual segun la introspeccion (`prisma db pull`) de la base
+// real. `firma_solicitudes`, `documentos` y `motor_ejecuciones` son
+// funcionalidad propia de este proyecto y no vienen de esa introspeccion.
 // ---------------------------------------------------------------------------
 
 model valida1_results {
-  id              BigInt    @id @default(autoincrement())
-  radicado        String    @unique
-  cedula          String?
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
-  gestionado_at   DateTime? @db.Timestamptz(6)
-  gestionado_by   String?
+  id            BigInt    @id @default(autoincrement())
+  radicado      String    @unique
+  cedula        String
+  request_json  Json?
+  response_json Json?
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  gestionado_at DateTime? @db.Timestamptz(6)
+  gestionado_by String?
   /// Observacion que deja el negociador al gestionar (opcional).
   gestionado_nota String?
 
@@ -175,15 +174,105 @@ model valida1_results {
   estado_manual_at DateTime? @db.Timestamptz(6)
   estado_manual_by String?
 
-  credito_decisiones    credito_decisiones?
-  document_results      document_results[]
-  documentos            documentos[]
-  identity_validations  identity_validations?
-  motor_data_results    motor_data_results[]
+  credit_tracking       credit_tracking?
+  envio_thomas_results  envio_thomas_results?
+  identity_results      identity_results?
+  motor_data_results    motor_data_results?
   motor_process_results motor_process_results?
+  workflow_results      workflow_results?
+  documentos            documentos[]
   motor_ejecuciones     motor_ejecuciones[]
 
   @@index([cedula], map: "idx_valida1_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_valida1_updated")
+}
+
+model motor_data_results {
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_motor_data_valida1")
+
+  @@index([cedula], map: "idx_motor_data_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_motor_data_updated")
+}
+
+model motor_process_results {
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_motor_process_valida1")
+
+  @@index([cedula], map: "idx_motor_process_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_motor_process_updated")
+}
+
+model credit_tracking {
+  radicado        String          @id
+  cedula          String?
+  correo          String?
+  numero_flujo    Int?
+  req_135         String?
+  req_143         String?
+  completado      Boolean         @default(false)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  nombre          String?
+  telefono        String?
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_credit_tracking_radicado")
+
+  @@index([cedula], map: "idx_credit_tracking_cedula")
+  @@index([completado], map: "idx_credit_tracking_completado", where: raw("(completado = false)"))
+  @@index([updated_at(sort: Desc)], map: "idx_credit_tracking_updated")
+}
+
+model envio_thomas_results {
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_envio_thomas_radicado")
+
+  @@index([cedula], map: "idx_envio_thomas_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_envio_thomas_updated")
+}
+
+model identity_results {
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_identity_radicado")
+
+  @@index([cedula], map: "idx_identity_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_identity_updated")
+}
+
+model workflow_results {
+  id              BigInt          @id @default(autoincrement())
+  radicado        String          @unique
+  cedula          String
+  request_json    Json?
+  response_json   Json?
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], map: "fk_workflow_radicado")
+
+  @@index([cedula], map: "idx_workflow_cedula")
+  @@index([updated_at(sort: Desc)], map: "idx_workflow_updated")
 }
 
 /// Indice de los archivos subidos. El contenido vive en Azure Blob Storage;
@@ -285,47 +374,6 @@ model firma_solicitudes {
   @@index([status], map: "idx_firma_status")
 }
 
-model identity_validations {
-  id              BigInt           @id @default(autoincrement())
-  radicado        String?          @unique(map: "identity_validations_radicado_valida1_key")
-  cedula          String?
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime         @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
-  valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_identity_valida1")
-
-  @@index([cedula], map: "idx_identity_cedula")
-  @@index([radicado], map: "idx_identity_radicado")
-}
-
-model motor_data_results {
-  id              BigInt           @id @default(autoincrement())
-  radicado        String?
-  cedula          String?
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime         @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
-  valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_motor_data_valida1")
-
-  @@index([cedula], map: "idx_motor_data_cedula")
-  @@index([radicado], map: "idx_motor_data_radicado")
-}
-
-model motor_process_results {
-  id              BigInt          @id @default(autoincrement())
-  radicado        String          @unique
-  cedula          String?
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime        @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
-  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onDelete: Cascade, onUpdate: NoAction, map: "fk_motor_process_valida1")
-
-  @@index([cedula], map: "idx_motor_process_cedula")
-}
-
 /// Historial de ejecuciones del motor. `motor_process_results` guarda solo la
 /// vigente (una fila por radicado); aqui queda cada version anterior, incluida
 /// la que produjo el motor automatico.
@@ -334,7 +382,7 @@ model motor_process_results {
 /// fila mas antigua es siempre el original. El diff de campos no se guarda: se
 /// calcula comparando dos filas consecutivas, para no duplicar el dato.
 model motor_ejecuciones {
-  id            BigInt @id @default(autoincrement())
+  id            BigInt   @id @default(autoincrement())
   radicado      String
   request_json  Json?
   response_json Json?
@@ -347,59 +395,6 @@ model motor_ejecuciones {
   valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onDelete: Cascade, onUpdate: NoAction, map: "fk_motor_ejecuciones_valida1")
 
   @@index([radicado, created_at(sort: Desc)], map: "idx_motor_ejecuciones_radicado")
-}
-
-model credito_decisiones {
-  id              BigInt          @id @default(autoincrement())
-  radicado        String          @unique
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime        @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
-  valida1_results valida1_results @relation(fields: [radicado], references: [radicado], onDelete: Cascade, onUpdate: NoAction, map: "fk_credito_valida1")
-}
-
-model document_results {
-  id              BigInt           @id @default(autoincrement())
-  radicado        String?
-  cedula          String?
-  request_json    Json?
-  response_json   Json?
-  created_at      DateTime         @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime         @default(now()) @db.Timestamptz(6)
-  valida1_results valida1_results? @relation(fields: [radicado], references: [radicado], onUpdate: NoAction, map: "fk_document_valida1")
-
-  @@index([cedula], map: "idx_document_cedula")
-  @@index([radicado], map: "idx_document_radicado")
-}
-
-model datos_asociado {
-  id                    BigInt   @id @default(autoincrement())
-  cedula                String   @unique
-  primer_apellido       String?
-  nombre                String?
-  nombre_asociado       String?
-  ciudad                String?
-  cliente_empresa       String?
-  estado_civil          String?
-  estado_civil_norm     String?
-  tipo_vivienda         String?
-  nivel                 String?
-  usuario_credito       String?
-  fecha_ingreso         String?
-  fecha_ingreso_empresa String?
-  edad                  Decimal? @db.Decimal
-  personas_cargo        Decimal? @db.Decimal
-  antiguedad_coop       Decimal? @db.Decimal
-  antiguedad_laboral    Decimal? @db.Decimal
-  salario               Decimal? @db.Decimal
-  aportes               Decimal? @db.Decimal
-  deuda_coopvalili      Decimal? @db.Decimal
-  cuota_disponible      Decimal? @db.Decimal
-  created_at            DateTime @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime @default(now()) @db.Timestamptz(6)
-
-  @@index([cedula], map: "idx_datos_asociado_cedula")
 }
 
 // ---------------------------------------------------------------------------
