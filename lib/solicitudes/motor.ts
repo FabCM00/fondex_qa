@@ -15,6 +15,11 @@ const PASOS_MOTOR = ["motor-process"] as const
 
 export type PasoMotor = (typeof PASOS_MOTOR)[number]
 
+/** El paso es el identificador de dominio; el endpoint real usa guion bajo. */
+const RUTA_POR_PASO: Record<PasoMotor, string> = {
+  "motor-process": "motor_process",
+}
+
 export type RespuestaMotor =
   | { ok: true; datos: unknown }
   | { ok: false; mensaje: string }
@@ -95,7 +100,7 @@ export async function ejecutarMotor(
   let url: URL
   try {
     // La base puede venir con o sin barra final.
-    url = new URL(`${base.replace(/\/+$/, "")}/${paso}`)
+    url = new URL(`${base.replace(/\/+$/, "")}/${RUTA_POR_PASO[paso]}`)
   } catch {
     return { ok: false, mensaje: `API_MOTOR_API_URL no es una URL válida.` }
   }
