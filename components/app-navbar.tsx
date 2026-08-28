@@ -36,7 +36,7 @@ export function AppNavbar() {
         <span className="hidden items-baseline gap-1.5 text-sm font-medium sm:flex">
           {MARCA.nombre}
           <span className="text-[10px] font-normal text-muted-foreground">
-            {MARCA.version}
+            {MARCA.cooperativa} - {MARCA.version}
           </span>
         </span>
       </div>

@@ -184,7 +184,7 @@ export function AppSidebar({
             <SidebarFooter className="gap-2 border-t p-2">
               <NavUser />
               <span className="px-2 text-center text-[10px] text-muted-foreground">
-                {MARCA.version}
+                {MARCA.cooperativa} - {MARCA.version}
               </span>
             </SidebarFooter>
           </Sidebar>
