@@ -450,13 +450,6 @@ export function TabDocumentos({ solicitud }: { solicitud: Solicitud }) {
 
         {enFirma.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-            <Image
-              src={firmaSvg}
-              alt=""
-              aria-hidden="true"
-              unoptimized
-              className="h-auto w-56 max-w-full"
-            />
             <p className="text-sm font-medium">Sin documentos en firma</p>
             <p className="max-w-xs text-xs text-muted-foreground">
               Selecciona uno o varios documentos arriba y usa &ldquo;Enviar a

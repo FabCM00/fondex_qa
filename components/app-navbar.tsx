@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { MARCA } from "@/lib/marca"
 import { MODULOS_POR_ROL } from "@/lib/navegacion"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
@@ -26,14 +27,17 @@ export function AppNavbar() {
     <header className="flex h-12 shrink-0 items-center gap-1 border-b bg-sidebar px-3">
       <div className="flex items-center gap-2 pe-2">
         <Image
-          src="/logos/logo1.png"
-          alt="WANT N' GET"
+          src={MARCA.logo}
+          alt={MARCA.nombre}
           width={24}
           height={24}
           className="size-6 object-contain"
         />
-        <span className="hidden text-sm font-medium sm:inline">
-          WANT N&apos; GET
+        <span className="hidden items-baseline gap-1.5 text-sm font-medium sm:flex">
+          {MARCA.nombre}
+          <span className="text-[10px] font-normal text-muted-foreground">
+            {MARCA.version}
+          </span>
         </span>
       </div>
 

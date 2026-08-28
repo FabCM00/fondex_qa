@@ -181,8 +181,11 @@ export function AppSidebar({
                 </SidebarGroupContent>
               </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter className="border-t p-2">
+            <SidebarFooter className="gap-2 border-t p-2">
               <NavUser />
+              <span className="px-2 text-center text-[10px] text-muted-foreground">
+                {MARCA.version}
+              </span>
             </SidebarFooter>
           </Sidebar>
         </div>
