@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { JsonViewer } from "@/components/json-viewer"
+import { DialogoConfirmarEnvioCore } from "@/components/motores/dialogo-confirmar-envio-core"
 import { DialogoEditarMotor } from "@/components/motores/dialogo-editar-motor"
 import { HistorialMotor } from "@/components/solicitud/historial-motor"
 import { Button } from "@/components/ui/button"
@@ -14,9 +15,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useNotificaciones } from "@/components/ui/notificaciones"
 import { useDashboard } from "@/components/dashboard-context"
-import { MOTOR_POR_DEFECTO } from "@/lib/motores/schema"
+import { cargarEstadoIntentos, enviarACore } from "@/lib/motores/acciones"
+import {
+  AJUSTE_ENVIO_SCORE,
+  AJUSTE_REEJECUCION,
+  MOTOR_POR_DEFECTO,
+  type EstadoIntento,
+} from "@/lib/motores/schema"
 import { PASOS, type PasoId, type Solicitud } from "@/lib/solicitudes/schema"
-import { CheckIcon, ChevronDownIcon, PencilIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, PencilIcon, SendIcon } from "lucide-react"
 
 type Direccion = "request" | "response"
 
@@ -35,6 +42,17 @@ export function TabJson({ solicitud }: { solicitud: Solicitud }) {
   const { notificar } = useNotificaciones()
   const { bandeja, seleccionarSolicitud } = useDashboard()
   const [refrescoHistorial, setRefrescoHistorial] = React.useState(0)
+  const [intentos, setIntentos] = React.useState<Record<string, EstadoIntento>>({})
+  const [confirmandoScore, setConfirmandoScore] = React.useState(false)
+  const [enviandoScore, setEnviandoScore] = React.useState(false)
+
+  const cargarIntentos = React.useCallback(() => {
+    cargarEstadoIntentos(solicitud.radicado, PASO_EDITABLE).then(setIntentos)
+  }, [solicitud.radicado])
+
+  React.useEffect(() => {
+    cargarIntentos()
+  }, [cargarIntentos])
 
   const payloads = solicitud.payloads ?? {}
 
@@ -42,12 +60,25 @@ export function TabJson({ solicitud }: { solicitud: Solicitud }) {
   const direccionActual = DIRECCIONES.find((item) => item.id === direccion)
 
   const puedeEditar = paso === PASO_EDITABLE
+  const puedeReejecutar = intentos[AJUSTE_REEJECUCION]?.puede ?? true
+  const puedeEnviarScore = intentos[AJUSTE_ENVIO_SCORE]?.puede ?? true
 
   const alEjecutar = (mensaje: string) => {
     notificar(mensaje, "exito")
     setRefrescoHistorial((n) => n + 1)
+    cargarIntentos()
     seleccionarSolicitud(solicitud.radicado)
     bandeja.irAPagina(bandeja.pagina)
+  }
+
+  const confirmarEnvioScore = async () => {
+    setEnviandoScore(true)
+    const resultado = await enviarACore(solicitud.radicado, PASO_EDITABLE)
+    setEnviandoScore(false)
+    setConfirmandoScore(false)
+
+    notificar(resultado.mensaje, resultado.ok ? "exito" : "error")
+    if (resultado.ok) cargarIntentos()
   }
 
   return (
@@ -66,12 +97,30 @@ export function TabJson({ solicitud }: { solicitud: Solicitud }) {
           </button>
         ))}
 
+        {puedeEditar && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="ms-auto h-7 gap-1.5 px-2.5 text-xs"
+            disabled={!puedeEnviarScore}
+            title={
+              puedeEnviarScore
+                ? undefined
+                : "Se agotaron los intentos de envío a Core para esta solicitud."
+            }
+            onClick={() => setConfirmandoScore(true)}
+          >
+            <SendIcon className="size-3.5" />
+            Enviar a Core
+          </Button>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <button
                 type="button"
-                className="ms-auto flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-open:bg-accent"
+                className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground data-open:bg-accent ${puedeEditar ? "" : "ms-auto"}`}
               />
             }
           >
@@ -110,6 +159,12 @@ export function TabJson({ solicitud }: { solicitud: Solicitud }) {
                 size="sm"
                 variant="ghost"
                 className="h-7 gap-1.5 px-2.5 text-xs"
+                disabled={!puedeReejecutar}
+                title={
+                  puedeReejecutar
+                    ? undefined
+                    : "Se agotaron los intentos de reejecución para esta solicitud."
+                }
                 onClick={() => setEditando(true)}
               >
                 <PencilIcon className="size-3.5" />
@@ -134,6 +189,16 @@ export function TabJson({ solicitud }: { solicitud: Solicitud }) {
           radicado={solicitud.radicado}
           motor={PASO_EDITABLE}
           onEjecutado={alEjecutar}
+        />
+      )}
+
+      {confirmandoScore && (
+        <DialogoConfirmarEnvioCore
+          key={solicitud.radicado}
+          radicado={solicitud.radicado}
+          onOpenChange={setConfirmandoScore}
+          onConfirmar={confirmarEnvioScore}
+          enviando={enviandoScore}
         />
       )}
     </div>

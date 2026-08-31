@@ -22,6 +22,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { esRutaProtegida } from "@/lib/auth/roles"
 import { twoFactor } from "@/lib/auth/cliente"
 
 export function FormularioVerificar() {
@@ -70,7 +71,8 @@ export function FormularioVerificar() {
       )
     }
 
-    router.replace(searchParams.get("from") ?? "/")
+    const from = searchParams.get("from")
+    router.replace(from && !esRutaProtegida(from) ? from : "/")
     router.refresh()
   }
 

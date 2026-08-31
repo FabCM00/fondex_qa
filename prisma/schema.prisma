@@ -174,6 +174,13 @@ model valida1_results {
   estado_manual_at DateTime? @db.Timestamptz(6)
   estado_manual_by String?
 
+  /// Consumo de intentos por radicado, uno por clave de motorAjuste (ej:
+  /// {"permitir_reejecucion": 1, "permitir_envio_score": 0}). Arranca en
+  /// {} y cada accion suma 1 a su clave; se compara contra el limite vigente
+  /// en motorAjuste (no se copia el limite aqui, asi que cambiarlo en Ajustes
+  /// afecta de inmediato a toda solicitud, nueva o vieja).
+  intentos_json Json @default("{}")
+
   credit_tracking       credit_tracking?
   envio_thomas_results  envio_thomas_results?
   identity_results      identity_results?
@@ -442,4 +449,46 @@ model edicionMotor {
   @@unique([motor, campo], map: "uq_edicion_motor_campo")
   @@index([motor, orden], map: "idx_edicion_motor_orden")
   @@map("edicion_motor")
+}
+
+// ---------------------------------------------------------------------------
+// AJUSTES DEL MOTOR
+//
+// Interruptores/valores de configuracion por motor (permitir reejecucion,
+// intentos permitidos, permitir envio a Score, etc). Es clave/valor, igual
+// que edicionMotor con los campos: la misma tabla sirve para cualquier
+// ajuste nuevo que se agregue despues sin migrar de nuevo.
+// ---------------------------------------------------------------------------
+
+model motorAjuste {
+  id BigInt @id @default(autoincrement())
+
+  /// Que motor configura esta fila.
+  motor String
+
+  /// Identificador estable del ajuste (ej: "permitir_reejecucion").
+  clave String
+
+  /// Como se le presenta al usuario.
+  etiqueta String
+
+  /// Texto de ayuda bajo el control.
+  ayuda String?
+
+  /// Estado del interruptor (on/off).
+  activo Boolean @default(false)
+
+  /// Valor numerico asociado, cuando el ajuste lo requiere (ej: intentos
+  /// permitidos). NULL si el ajuste es solo on/off.
+  valor_numero Int?
+
+  /// Orden de aparicion en la pestana de Ajustes.
+  orden Int @default(0)
+
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+
+  @@unique([motor, clave], map: "uq_motor_ajuste_clave")
+  @@index([motor, orden], map: "idx_motor_ajuste_orden")
+  @@map("motor_ajuste")
 }

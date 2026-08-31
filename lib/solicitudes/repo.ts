@@ -18,6 +18,7 @@ const RELACIONES = {
   motor_data_results: true,
   motor_process_results: true,
   identity_results: true,
+  workflow_results: true,
   credit_tracking: true,
 } as const
 
@@ -259,6 +260,7 @@ export async function obtenerSolicitud(
     motorData: fila.motor_data_results,
     motorProcess: fila.motor_process_results,
     identidad: fila.identity_results,
+    workflow: fila.workflow_results,
     estado143: fila.credit_tracking?.req_143 ?? null,
   })
 }

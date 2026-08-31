@@ -10,6 +10,7 @@ import logo from "@/public/logos/logo1.png"
 import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
 import { avisoDeParametros, type Aviso } from "@/lib/auth/avisos-login"
+import { esRutaProtegida } from "@/lib/auth/roles"
 import { getLastUsedLoginMethod, signIn } from "@/lib/auth/cliente"
 import { cn } from "@/lib/utils"
 import {
@@ -49,6 +50,17 @@ function useUltimoMetodo() {
     () => getLastUsedLoginMethod(),
     () => null // en el servidor no hay cookie que leer
   )
+}
+
+/**
+ * A donde mandar tras el login. `from` puede venir de un link viejo o
+ * compartido con el rol equivocado (ej. un admin abre un link a /dashboard):
+ * si apunta a una ruta con regla de rol (/admin, /dashboard) se ignora y se
+ * usa "/", que resuelve el destino correcto en el servidor segun el rol real.
+ */
+function destinoTrasLogin(from: string | null): string {
+  if (!from || esRutaProtegida(from)) return "/"
+  return from
 }
 
 /** Marca el camino que el usuario ya conoce. No implica nada de seguridad. */
@@ -118,12 +130,13 @@ export function LoginForm({
 
     if (hayError) return
 
+    const destino = destinoTrasLogin(searchParams.get("from"))
+
     setCargando(true)
     const { data, error } = await signIn.email({
       email: emailVal,
       password,
-      // "/" resuelve la ruta inicial según el rol en el servidor.
-      callbackURL: searchParams.get("from") ?? "/",
+      callbackURL: destino,
     })
     setCargando(false)
 
@@ -138,15 +151,14 @@ export function LoginForm({
     // La cuenta tiene segundo factor: la contrasena fue correcta pero todavia
     // no hay sesion. Falta el codigo, y eso pasa en /verificar.
     if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
-      const destino = searchParams.get("from")
       setRedirigiendo(true)
       return router.push(
-        destino ? `/verificar?from=${encodeURIComponent(destino)}` : "/verificar"
+        destino !== "/" ? `/verificar?from=${encodeURIComponent(destino)}` : "/verificar"
       )
     }
 
     setRedirigiendo(true)
-    router.replace(searchParams.get("from") ?? "/")
+    router.replace(destino)
     router.refresh()
   }
 
@@ -156,7 +168,7 @@ export function LoginForm({
 
     const { error } = await signIn.social({
       provider: "microsoft",
-      callbackURL: searchParams.get("from") ?? "/",
+      callbackURL: destinoTrasLogin(searchParams.get("from")),
     })
 
     if (error) {

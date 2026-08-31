@@ -3,21 +3,14 @@ import "server-only"
 import http from "node:http"
 import https from "node:https"
 
-/**
- * Cliente del motor de credito.
- *
- * La base sale de API_MOTOR_API_URL y el paso se concatena: por ahora solo
- * `motor-process`, que recalcula la decision a partir de un payload que ya
- * existe. `motor-data` no se expone porque volveria a llamar a los servicios
- * externos (Coopvalili, TransUnion) y traeria datos nuevos, no un recalculo.
- */
-const PASOS_MOTOR = ["motor-process"] as const
+const PASOS_MOTOR = ["motor-process", "workflow"] as const
 
 export type PasoMotor = (typeof PASOS_MOTOR)[number]
 
 /** El paso es el identificador de dominio; el endpoint real usa guion bajo. */
 const RUTA_POR_PASO: Record<PasoMotor, string> = {
   "motor-process": "motor_process",
+  workflow: "workflow",
 }
 
 export type RespuestaMotor =
@@ -27,13 +20,6 @@ export type RespuestaMotor =
 /** Si el motor no responde, no se deja la peticion colgada. */
 const MS_TIMEOUT = 60_000
 
-/**
- * Se usa `node:https` en vez de fetch porque el motor se sirve por HTTPS sobre
- * una IP: su certificado no coincide con ningun nombre y hay que aceptarlo
- * explicitamente (`rejectUnauthorized: false`). Con fetch eso obligaria a
- * tocar NODE_TLS_REJECT_UNAUTHORIZED, que desactivaria la validacion para toda
- * la app, incluidas las conexiones a Azure y ZapSign.
- */
 function pedir(
   url: URL,
   cuerpo: string,

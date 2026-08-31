@@ -1,6 +1,8 @@
+import { AjustesMotor } from "@/components/motores/ajustes-motor"
 import { TablaCampos } from "@/components/motores/tabla-campos"
+import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
 import { exigirRol } from "@/lib/auth/sesion"
-import { listarCampos } from "@/lib/motores/repo"
+import { listarAjustes, listarCampos } from "@/lib/motores/repo"
 import { MOTOR_POR_DEFECTO, MOTORES } from "@/lib/motores/schema"
 
 // Server Component: los datos salen de la DB y la tabla solo los pinta.
@@ -8,7 +10,10 @@ export async function VistaEdicionMotor() {
   await exigirRol("ADMIN")
 
   const motor = MOTOR_POR_DEFECTO
-  const campos = await listarCampos(motor)
+  const [campos, ajustes] = await Promise.all([
+    listarCampos(motor),
+    listarAjustes(motor),
+  ])
   const label = MOTORES.find((item) => item.id === motor)?.label ?? motor
 
   return (
@@ -21,7 +26,21 @@ export async function VistaEdicionMotor() {
             {label}. Lo que no esté aquí no aparece en el popup.
           </p>
         </div>
-        <TablaCampos motor={motor} inicial={campos} />
+
+        <Tabs defaultValue="campos">
+          <TabsList>
+            <TabsTab value="campos">Campos del motor</TabsTab>
+            <TabsTab value="ajustes">Ajustes del motor</TabsTab>
+          </TabsList>
+
+          <TabsPanel value="campos">
+            <TablaCampos motor={motor} inicial={campos} />
+          </TabsPanel>
+
+          <TabsPanel value="ajustes">
+            <AjustesMotor motor={motor} inicial={ajustes} />
+          </TabsPanel>
+        </Tabs>
       </div>
     </div>
   )

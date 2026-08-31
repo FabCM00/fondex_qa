@@ -7,24 +7,101 @@ import { escribirRuta, partirRuta } from "@/lib/motores/rutas"
 import {
   actualizarCampo,
   construirFormulario,
+  consumirIntento,
   crearCampo,
   eliminarCampo,
+  guardarAjuste,
+  listarAjustes,
   listarCampos,
+  obtenerIntentosUsados,
   obtenerRequestVigente,
 } from "@/lib/motores/repo"
 import {
+  AJUSTE_ENVIO_SCORE,
+  AJUSTE_REEJECUCION,
   esMotorId,
   esTipoCampo,
   MOTOR_POR_DEFECTO,
   normalizarValor,
+  type AjusteMotor,
   type CampoFormulario,
   type EntradaCampo,
+  type EstadoIntento,
   type Resultado,
 } from "@/lib/motores/schema"
 
 export async function cargarCamposEdicion(motor: string) {
   await exigirRol("ADMIN")
   return listarCampos(motor)
+}
+
+export async function cargarAjustesMotor(
+  motor: string = MOTOR_POR_DEFECTO
+): Promise<AjusteMotor[]> {
+  await exigirRol("ADMIN")
+  return listarAjustes(motor)
+}
+
+/**
+ * Cupo por radicado, para cualquier usuario: por cada clave de motorAjuste,
+ * el limite vigente, cuanto ya se uso en ESTE radicado y si todavia puede.
+ * El limite nunca se copia a la solicitud: siempre se lee en vivo desde
+ * motorAjuste, asi que cambiarlo en Ajustes afecta al instante a toda
+ * solicitud, nueva o vieja.
+ */
+export async function cargarEstadoIntentos(
+  radicado: string,
+  motor: string = MOTOR_POR_DEFECTO
+): Promise<Record<string, EstadoIntento>> {
+  await exigirUsuario()
+
+  const [ajustes, usados] = await Promise.all([
+    listarAjustes(motor),
+    obtenerIntentosUsados(radicado),
+  ])
+
+  return Object.fromEntries(
+    ajustes.map((ajuste) => {
+      const usadosClave = usados[ajuste.clave] ?? 0
+      const limite = ajuste.valorNumero
+      const puede = limite === null ? true : usadosClave < limite
+      return [ajuste.clave, { limite, usados: usadosClave, puede }]
+    })
+  )
+}
+
+async function validarCupo(
+  radicado: string,
+  motor: string,
+  clave: string
+): Promise<Resultado & { puede: boolean }> {
+  const estado = await cargarEstadoIntentos(radicado, motor)
+  const ajuste = estado[clave]
+
+  if (ajuste && !ajuste.puede) {
+    return {
+      ok: false,
+      puede: false,
+      mensaje: `Se agotaron los intentos permitidos (${ajuste.limite}) para esta solicitud.`,
+    }
+  }
+
+  return { ok: true, puede: true, mensaje: "" }
+}
+
+export async function guardarAjusteMotor(
+  motor: string,
+  clave: string,
+  valorNumero: number
+): Promise<Resultado> {
+  await exigirRol("ADMIN")
+
+  try {
+    await guardarAjuste(motor, clave, valorNumero)
+    return { ok: true, mensaje: "Ajuste actualizado." }
+  } catch {
+    return { ok: false, mensaje: "No se pudo guardar el ajuste." }
+  }
 }
 
 export async function cargarFormularioEdicion(
@@ -72,6 +149,9 @@ export async function ejecutarConCambios(
   if (!esMotorId(motor)) {
     return { ok: false, mensaje: "Ese motor no existe." }
   }
+
+  const cupo = await validarCupo(radicado, motor, AJUSTE_REEJECUCION)
+  if (!cupo.puede) return cupo
 
   const vigente = await prisma.motor_process_results.findUnique({
     where: { radicado },
@@ -152,7 +232,81 @@ export async function ejecutarConCambios(
     }),
   ])
 
+  await consumirIntento(radicado, AJUSTE_REEJECUCION)
+
   return { ok: true, mensaje: "Motor ejecutado. Se actualizó la solicitud." }
+}
+
+/**
+ * Arma el mismo payload que se le manda a Core, a partir de la oferta que ya
+ * calculo motor-process. Se usa para mostrarlo en el dialogo de confirmacion
+ * antes de enviar: nunca se acepta el JSON que mande el cliente, siempre se
+ * reconstruye aqui desde lo que realmente hay guardado.
+ */
+export async function previsualizarEnvioCore(
+  radicado: string
+): Promise<{ ok: true; payload: unknown } | { ok: false; mensaje: string }> {
+  await exigirUsuario()
+
+  const fila = await prisma.motor_process_results.findUnique({
+    where: { radicado },
+    select: { cedula: true, response_json: true },
+  })
+
+  const oferta = (fila?.response_json as { oferta?: unknown } | null)?.oferta
+
+  if (!fila || !oferta) {
+    return {
+      ok: false,
+      mensaje: "Esta solicitud no tiene una oferta calculada por el motor.",
+    }
+  }
+
+  return {
+    ok: true,
+    payload: { id: fila.cedula, radicado, oferta },
+  }
+}
+
+export async function enviarACore(
+  radicado: string,
+  motor: string = MOTOR_POR_DEFECTO
+): Promise<Resultado> {
+  await exigirUsuario()
+
+  if (!esMotorId(motor)) {
+    return { ok: false, mensaje: "Ese motor no existe." }
+  }
+
+  const cupo = await validarCupo(radicado, motor, AJUSTE_ENVIO_SCORE)
+  if (!cupo.puede) return cupo
+
+  const previa = await previsualizarEnvioCore(radicado)
+  if (!previa.ok) return previa
+
+  const resultado = await ejecutarMotor("workflow", previa.payload)
+
+  if (!resultado.ok) {
+    return { ok: false, mensaje: resultado.mensaje }
+  }
+
+  await prisma.workflow_results.upsert({
+    where: { radicado },
+    create: {
+      radicado,
+      cedula: (previa.payload as { id: string }).id,
+      request_json: previa.payload as never,
+      response_json: resultado.datos as never,
+    },
+    update: {
+      request_json: previa.payload as never,
+      response_json: resultado.datos as never,
+    },
+  })
+
+  await consumirIntento(radicado, AJUSTE_ENVIO_SCORE)
+
+  return { ok: true, mensaje: "Se envió el crédito a Core." }
 }
 
 function validarEntrada(

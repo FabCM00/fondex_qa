@@ -54,6 +54,23 @@ export type EntradaCampo = {
 
 export type Resultado = { ok: boolean; mensaje: string }
 
+export type AjusteMotor = {
+  id: string
+  motor: string
+  clave: string
+  etiqueta: string
+  ayuda: string | null
+  valorNumero: number | null
+  orden: number
+}
+
+// Claves de motorAjuste que controlan intentos por radicado. Compartidas
+// entre el server (validar/consumir) y el cliente (habilitar botones).
+export const AJUSTE_REEJECUCION = "permitir_reejecucion"
+export const AJUSTE_ENVIO_SCORE = "permitir_envio_score"
+
+export type EstadoIntento = { limite: number | null; usados: number; puede: boolean }
+
 export function normalizarValor(
   crudo: unknown,
   tipo: TipoCampo

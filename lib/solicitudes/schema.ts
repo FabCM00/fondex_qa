@@ -129,6 +129,7 @@ export const PASOS = [
     tabla: "motor_process_results",
   },
   { id: "identidad", label: "Identidad", tabla: "identity_results" },
+  { id: "workflow", label: "Workflow", tabla: "workflow_results" },
 ] as const
 
 export type CampoKey = (typeof SECCIONES)[number]["campos"][number]["key"]

@@ -156,6 +156,7 @@ export type FilasSolicitud = {
   motorData?: { request_json?: unknown; response_json?: unknown } | null
   motorProcess?: { request_json?: unknown; response_json?: unknown } | null
   identidad?: { request_json?: unknown; response_json?: unknown } | null
+  workflow?: { request_json?: unknown; response_json?: unknown } | null
   /** req_143 de credit_tracking: "E" preaprobado, "A" aprobado, "C" contabilizado. */
   estado143?: string | null
 }
@@ -338,6 +339,7 @@ export function mapearSolicitud(filas: FilasSolicitud): Solicitud {
       "motor-data": Boolean(filas.motorData),
       "motor-process": Boolean(filas.motorProcess),
       identidad: Boolean(filas.identidad),
+      workflow: Boolean(filas.workflow),
     },
     payloads: {
       validate: {
@@ -355,6 +357,10 @@ export function mapearSolicitud(filas: FilasSolicitud): Solicitud {
       identidad: {
         request: filas.identidad?.request_json,
         response: filas.identidad?.response_json,
+      },
+      workflow: {
+        request: filas.workflow?.request_json,
+        response: filas.workflow?.response_json,
       },
     },
   }
